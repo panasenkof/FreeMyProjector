@@ -131,13 +131,13 @@ if ($null -ne $script:AdbExecutable) {
                 }
             }
             # Optional, read-only HOME resolution. Unsupported firmware => null.
-            $home = Invoke-ReadOnlyAdb -Arguments @(
+            $homeResolution = Invoke-ReadOnlyAdb -Arguments @(
                 'shell', 'cmd', 'package', 'resolve-activity', '--brief',
                 '-a', 'android.intent.action.MAIN',
                 '-c', 'android.intent.category.HOME'
             )
-            if ($home.Success) {
-                foreach ($line in ($home.Text -split '\r?\n')) {
+            if ($homeResolution.Success) {
+                foreach ($line in ($homeResolution.Text -split '\r?\n')) {
                     $match = [regex]::Match($line.Trim(),
                         '^([A-Za-z][A-Za-z0-9_.]*/[A-Za-z0-9_.$]{1,100})$')
                     if ($match.Success -and $match.Groups[1].Value.Length -le 150) {
