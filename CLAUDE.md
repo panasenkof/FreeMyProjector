@@ -1,3 +1,5 @@
+> **FreeMyProjector project override (2026-10-21):** Read [AGENTS.md](AGENTS.md), [PLAN.md](PLAN.md), and [docs/SDD_GUIDE.md](docs/SDD_GUIDE.md) first. This file is copied from the original Free My TV and includes device-specific instructions **not yet tested on the Xiaomi projector**. Do not disable its original HOME, alter Wi-Fi or run installer/system modification steps before the safety audit and user approval. The project uses OpenSpec-compatible specifications in `openspec/changes/`.
+
 # Free My TV: notes for Claude
 
 A home screen for Google TV and Android TV that replaces the stock one, plus a settings app that switches between
