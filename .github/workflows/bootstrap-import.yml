@@ -1,0 +1,46 @@
+name: Bootstrap Free My TV source
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bootstrap-import.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out destination repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Import upstream source into a review branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c import/free-my-tv-initial
+          git clone --branch main --depth 1 https://github.com/simbasjungles/free-my-tv.git "$RUNNER_TEMP/free-my-tv"
+          upstream_sha="$(git -C "$RUNNER_TEMP/free-my-tv" rev-parse HEAD)"
+          rsync -a --exclude=.git "$RUNNER_TEMP/free-my-tv/" "$GITHUB_WORKSPACE/"
+          cat > UPSTREAM.md <<EOF
+          # Upstream provenance
+          
+          Original project: https://github.com/simbasjungles/free-my-tv
+          
+          Imported upstream commit: `$upstream_sha`
+          
+          License: MIT. Keep the upstream LICENSE and attribution when
+          distributing copies or substantial portions of the software.
+          
+          This repository is an independent adaptation for Xiaomi Mi Smart Compact
+          Projector (reported model MJJGTYDS02FM). Upstream changes are optional
+          and should be reviewed before applying.
+          EOF
+          git add -A
+          git commit -m "Import Free My TV source (MIT) and record upstream provenance"
+          git push origin HEAD:refs/heads/import/free-my-tv-initial
+          echo "Imported upstream commit: $upstream_sha"
