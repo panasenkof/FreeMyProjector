@@ -1,0 +1,22 @@
+# OpenSpec-compatible project configuration.
+# The Markdown structure is committed now; local CLI/agent initialization is optional.
+schema: spec-driven
+context: |
+  Project: FreeMyProjector, independent Free My TV adaptation for Xiaomi Mi Smart Compact Projector.
+  Target hardware/firmware is not confirmed. Android TV 9 is an initial hypothesis from the seller model.
+  Existing Android Java application is built via build.sh, not Gradle.
+  PLAN.md is the canonical roadmap. AGENTS.md defines safety constraints.
+  Keep source requirements in Russian; preserve valid OpenSpec headings in English.
+  No root, package disabling, launcher/Wi-Fi changes or public keystore by default.
+rules:
+  proposal:
+    - Include the linked PLAN.md task ID, objective, non-goals, dependencies, and device risk.
+  specs:
+    - Every requirement has at least one observable WHEN/THEN scenario.
+    - Explicitly document failure paths and unknown behavior rather than assuming firmware support.
+  design:
+    - Reuse the existing Java/build.sh architecture until a measured reason justifies migration.
+    - Include security/privacy, rollback and on-device compatibility considerations.
+  tasks:
+    - Separate automatic tests, manual tests on the projector, and documentation updates.
+    - Do not mark device testing as complete based solely on a successful CI run.

@@ -1,0 +1,36 @@
+name: Validate SDD specifications
+
+on:
+  pull_request:
+    paths:
+      - "openspec/**"
+      - "PLAN.md"
+      - "AGENTS.md"
+      - "docs/SDD_GUIDE.md"
+      - ".github/workflows/spec-validation.yml"
+  push:
+    branches: [main]
+    paths:
+      - "openspec/**"
+      - ".github/workflows/spec-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-specs:
+    name: OpenSpec structure and scenario validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install OpenSpec CLI
+        run: npm install -g @fission-ai/openspec@1.14.3
+      - name: Show CLI version
+        run: openspec --version
+      - name: Validate proposed and accepted specifications
+        run: openspec validate --all --strict --no-interactive
