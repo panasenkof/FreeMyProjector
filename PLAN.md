@@ -22,7 +22,7 @@
 | ID | Приоритет | Задача и ожидаемый результат | Спецификация / дальнейшее действие | Статус |
 |---|---|---|---|---|
 | P-00 | P0 | Принять правила SDD, единый план и шаблоны проверок | [PR #2](https://github.com/panasenkof/FreeMyProjector/pull/2), [инструкция](docs/SDD_GUIDE.md) | ✅ Слито, SDD введён |
-| P-01 | P0 | Пассивная диагностика модели, прошивки, Android/ADB и доступных HOME-компонентов **без изменений** | [Спецификация](openspec/changes/device-compatibility-audit/proposal.md), [инструкция Windows](docs/DEVICE_DIAGNOSTICS_WINDOWS.md), [PR реализации](https://github.com/panasenkof/FreeMyProjector/pulls) | Реализация/CI; нужен ручной тест на проекторе |
+| P-01 | P0 | Пассивная диагностика модели, прошивки, Android/ADB и доступных HOME-компонентов **без изменений** | [Спецификация](openspec/changes/device-compatibility-audit/proposal.md), [инструкция Windows](docs/DEVICE_DIAGNOSTICS_WINDOWS.md), [PR #3](https://github.com/panasenkof/FreeMyProjector/pull/3) | ✅ CI (mock); ⏳ реальное устройство/ручная приёмка |
 | P-02 | P0 | Воспроизводимая базовая сборка APK (Linux/Windows), проверка артефакта, CI с тестами и сохранением логов | Создать отдельный OpenSpec change после P-00; зависит от исходников, **не** от доступа к устройству | В очереди |
 | P-03 | P0 | Собственный package ID, имя FreeMyProjector, управляемая подпись APK, безопасная миграция обновлений | Отдельный change; проверить текущее `io.freemytv` и `freemytv.keystore`, не заливать секреты | В очереди |
 | P-04 | P0 | Аудит безопасности переключения HOME: восстановление штатного Xiaomi Launcher, аварийный выход и откат по ADB | Отдельный change; зависит от P-01; **до** любых системных переключений | В очереди |
