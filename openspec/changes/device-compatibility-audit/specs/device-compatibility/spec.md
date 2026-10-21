@@ -1,5 +1,3 @@
-# Device Compatibility Audit — proposed requirements
-
 ## ADDED Requirements
 
 ### Requirement: Только чтение сведений об устройстве
