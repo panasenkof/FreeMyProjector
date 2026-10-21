@@ -1,0 +1,31 @@
+name: P-01 Read-only ADB diagnostics tests
+
+on:
+  pull_request:
+    paths:
+      - "tools/read-only-device-info.ps1"
+      - "tests/Test-ReadOnlyDeviceInfo.ps1"
+      - "tests/fixtures/mock-adb.ps1"
+      - ".github/workflows/device-audit-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tools/read-only-device-info.ps1"
+      - "tests/**"
+      - ".github/workflows/device-audit-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-windows-powershell:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test with mocked ADB (no connected projector)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          .\tests\Test-ReadOnlyDeviceInfo.ps1
