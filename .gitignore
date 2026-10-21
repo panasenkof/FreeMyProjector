@@ -12,3 +12,6 @@ __pycache__/
 
 # macOS
 .DS_Store
+
+# Local hardware diagnostics (do not commit unique device data)
+*device-info.local.json
