@@ -26,6 +26,9 @@ jobs:
           git clone --branch main --depth 1 https://github.com/simbasjungles/free-my-tv.git "$RUNNER_TEMP/free-my-tv"
           upstream_sha="$(git -C "$RUNNER_TEMP/free-my-tv" rev-parse HEAD)"
           rsync -a --exclude=.git "$RUNNER_TEMP/free-my-tv/" "$GITHUB_WORKSPACE/"
+          # The Actions token cannot create another workflow in this repository.
+          # Exclude the upstream website deployment job (not needed for the projector).
+          rm -f .github/workflows/pages.yml
           cat > UPSTREAM.md <<EOF
           # Upstream provenance
           
