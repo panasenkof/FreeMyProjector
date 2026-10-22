@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 ANDROID = "{http://schemas.android.com/apk/res/android}"
-PACKAGE = "com.panasenkof.freemyprojector"
+PACKAGE = "com.fader.freemyprojector"
 CLASSES = {
     "App", "SettingsActivity", "HomeActivity", "Screensaver", "ScreensaverAlone",
     "ModeJob", "RemoteKeyService", "HomeReceiver",
