@@ -77,10 +77,10 @@ Set-Clipboard -Value ""
 Подлинность можно проверить локально:
 
 ```powershell
-& "C:\platform-tools\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.0.apk"
+& "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.0.apk"
 ```
 
-Это лишь пример расположения: **apksigner обычно находится в `<Android SDK>\build-tools\34.0.0\apksigner.bat`**, а не рядом с `adb.exe` в platform-tools. Укажи фактический путь к Android SDK.
+Это пример для типичного расположения Android SDK в Windows. Если SDK находится в другом каталоге, используй фактический путь к `build-tools\34.0.0\apksigner.bat`.
 
 ## 6. Пока нельзя менять домашний экран Xiaomi
 
