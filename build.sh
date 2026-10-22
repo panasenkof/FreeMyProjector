@@ -13,8 +13,18 @@ if [ -z "$SDK" ]; then
   done
 fi
 [ -n "$SDK" ] && [ -d "$SDK/build-tools" ] || { echo "Android SDK not found. Install it and set ANDROID_HOME (see README)."; exit 1; }
-BT="$SDK/build-tools/$(ls "$SDK/build-tools" | sort -V | tail -1)"
-AJ="$(ls -d "$SDK"/platforms/android-*/android.jar 2>/dev/null | sort -V | tail -1 || true)"
+# CI pins Android build tools/platform explicitly. Local builds keep the existing
+# latest-installed selection unless these opt-in environment variables are set.
+BT_VERSION="${FMP_BUILD_TOOLS_VERSION:-$(ls "$SDK/build-tools" | sort -V | tail -1)}"
+BT="$SDK/build-tools/$BT_VERSION"
+[ -x "$BT/aapt2" ] && [ -x "$BT/d8" ] && [ -x "$BT/zipalign" ] || {
+  echo "Android Build Tools ${BT_VERSION:-unknown} missing. Install via sdkmanager." >&2; exit 1;
+}
+if [ -n "${FMP_ANDROID_PLATFORM:-}" ]; then
+  AJ="$SDK/platforms/android-$FMP_ANDROID_PLATFORM/android.jar"
+else
+  AJ="$(ls -d "$SDK"/platforms/android-*/android.jar 2>/dev/null | sort -V | tail -1 || true)"
+fi
 [ -f "${AJ:-}" ] || { echo "Android platform not found. Run: sdkmanager \"platforms;android-34\""; exit 1; }
 JAVAC="${JAVA_HOME:+$JAVA_HOME/bin/}javac"
 KEYTOOL="${JAVA_HOME:+$JAVA_HOME/bin/}keytool"
@@ -114,6 +124,15 @@ esac
 "$BT/d8" --release --min-api 28 --lib "$AJ" --output out $(find out/classes -name '*.class')
 (cd out && zip -qj base.apk classes.dex)
 "$BT/zipalign" -f -p 4 out/base.apk out/aligned.apk
+
+# Build-only mode used by GitHub Actions: never generate or use a signing key.
+# A successfully compiled unsigned APK is NOT installable on Android.
+# Persistent private signing and the dedicated package ID are specified in P-03.
+if [ "${FMP_BUILD_UNSIGNED:-0}" = "1" ]; then
+  rm -f FreeMyTV.apk  # Do not leave a stale, seemingly installable file behind.
+  echo "Built out/aligned.apk (UNSIGNED — NOT INSTALLABLE)."
+  exit 0
+fi
 
 # --- Sign with your own key (created once; updates need the same key, so keep freemytv.keystore)
 if [ ! -f freemytv.keystore ]; then
