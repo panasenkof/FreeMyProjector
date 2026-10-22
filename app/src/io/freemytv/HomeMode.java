@@ -118,6 +118,12 @@ final class HomeMode {
 
     /** Asks the main process to switch (the settings screen calls this). */
     static void request(Context c, String mode) {
+        // P-04 safety gate: no launcher, Wi-Fi, package or screensaver changes
+        // until rollback has been audited on Xiaomi MiProjM05.
+        if (!ModeJob.PROJECTOR_HOME_SWITCH_AUDITED) {
+            notice(c, "Home switching is disabled pending Xiaomi safety verification (P-04).");
+            return;
+        }
         ModeJob.schedule(c, ModeJob.APPLY, mode, 0);
     }
 
