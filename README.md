@@ -1,6 +1,6 @@
 > **FreeMyProjector — independent Xiaomi projector adaptation (work in progress).**
 > This repository is based on Free My TV (MIT license). Compatibility with Xiaomi Mi Smart Compact Projector has **not** been verified on hardware yet.
-> **Russian project roadmap:** [PLAN.md](PLAN.md) · [How we use spec-driven development](docs/SDD_GUIDE.md) · [Hardware test notes](docs/PROJECTOR_COMPATIBILITY.md).
+> **Russian project roadmap:** [PLAN.md](PLAN.md) · [SDD process](docs/SDD_GUIDE.md) · [Hardware notes](docs/PROJECTOR_COMPATIBILITY.md) · [Private signed APK setup](docs/RELEASE_SIGNING.md).
 > The original upstream README follows; its install and HOME-switch instructions are **not validated for Xiaomi**.
 
 <div align="center">
