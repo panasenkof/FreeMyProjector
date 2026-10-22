@@ -1,14 +1,14 @@
 ## ADDED Requirements
 
 ### Requirement: Отдельная идентичность Android-приложения
-Приложение SHALL иметь package ID `com.panasenkof.freemyprojector`, метку `FreeMyProjector`, версионирование и корректные имена экспортируемых/внутренних Android компонентов.
+Приложение SHALL иметь package ID `com.fader.freemyprojector`, метку `FreeMyProjector`, версионирование и корректные имена экспортируемых/внутренних Android компонентов.
 
 #### Scenario: Создан unsigned APK в обычном CI
 - **WHEN** Android build выполняется на PR
 - **THEN** `aapt2 dump badging` показывает новый package ID, minSdk 28 и targetSdk 33, а Java Activity/Service/Receiver в манифесте указывают на реально существующие классы
 #### Scenario: Компоненты собственного HOME
 - **WHEN** приложение формирует имена компонентов HOME, Settings, Screensaver или RemoteKeyService
-- **THEN** package prefix равен `com.panasenkof.freemyprojector`, а component class совпадает с полным именем класса в manifest; фактическое переключение HOME в рамках P-03 не производится
+- **THEN** package prefix равен `com.fader.freemyprojector`, а component class совпадает с полным именем класса в manifest; фактическое переключение HOME в рамках P-03 не производится
 
 ### Requirement: Fail-closed подпись APK
 Скрипт сборки SHALL допускать приватное подписание только при явных параметрах keystore, alias и паролей, не создавать ключ с предсказуемым паролем и не выдавать unsigned APK за подписанный.
