@@ -105,6 +105,14 @@ jobs:
           } > out/ci-artifacts/BUILD-REPORT.txt
           test ! -e freemytv.keystore
 
+      - name: Upload compilation artifact (NOT installable)
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeMyProjector-UNSIGNED-NOT-INSTALLABLE
+          path: out/ci-artifacts/
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Smoke-test signing with disposable CI key (never upload this APK)
         shell: bash
         run: |
@@ -130,11 +138,3 @@ jobs:
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --min-sdk-version 28 FreeMyProjector.apk
           echo "PASS: signed using disposable key and verified. This APK will be deleted."
           # Do not upload or cache the disposable private key or signed APK.
-
-      - name: Upload compilation artifact (NOT installable)
-        uses: actions/upload-artifact@v4
-        with:
-          name: FreeMyProjector-UNSIGNED-NOT-INSTALLABLE
-          path: out/ci-artifacts/
-          if-no-files-found: error
-          retention-days: 14
