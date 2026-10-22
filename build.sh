@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
-# Builds FreeMyTV.apk without Gradle: aapt2 -> javac -> d8 -> zipalign -> apksigner.
+# Builds FreeMyProjector.apk with explicit private signing, or unsigned out/aligned.apk for CI.
 # Needs a JDK (17+) and the Android SDK command-line tools (build-tools 34+, platform android-34). See README.md.
 set -euo pipefail
 cd "$(dirname "$0")"
+
+# Fail closed: no signing unless the user explicitly supplied a private keystore.
+if [ "${FMP_BUILD_UNSIGNED:-0}" != "1" ]; then
+  for required in FMP_SIGNING_KEYSTORE FMP_SIGNING_KEY_ALIAS FMP_SIGNING_STORE_PASSWORD FMP_SIGNING_KEY_PASSWORD; do
+    if [ -z "${!required:-}" ]; then
+      echo "Missing $required; choose FMP_BUILD_UNSIGNED=1 for CI or configure private signing (docs/RELEASE_SIGNING.md)." >&2
+      exit 1
+    fi
+  done
+  [ -f "$FMP_SIGNING_KEYSTORE" ] || { echo "Signing keystore path not found." >&2; exit 1; }
+fi
 
 # --- Tools
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
@@ -27,7 +38,6 @@ else
 fi
 [ -f "${AJ:-}" ] || { echo "Android platform not found. Run: sdkmanager \"platforms;android-34\""; exit 1; }
 JAVAC="${JAVA_HOME:+$JAVA_HOME/bin/}javac"
-KEYTOOL="${JAVA_HOME:+$JAVA_HOME/bin/}keytool"
 command -v "$JAVAC" >/dev/null 2>&1 || { echo "JDK not found. Install JDK 17 and set JAVA_HOME."; exit 1; }
 
 # --- Settings: config.properties -> Config.java
@@ -129,15 +139,18 @@ esac
 # A successfully compiled unsigned APK is NOT installable on Android.
 # Persistent private signing and the dedicated package ID are specified in P-03.
 if [ "${FMP_BUILD_UNSIGNED:-0}" = "1" ]; then
-  rm -f FreeMyTV.apk  # Do not leave a stale, seemingly installable file behind.
+  rm -f FreeMyTV.apk FreeMyProjector.apk  # Never leave a stale signed file behind.
   echo "Built out/aligned.apk (UNSIGNED — NOT INSTALLABLE)."
   exit 0
 fi
 
-# --- Sign with your own key (created once; updates need the same key, so keep freemytv.keystore)
-if [ ! -f freemytv.keystore ]; then
-  "$KEYTOOL" -genkeypair -keystore freemytv.keystore -alias freemytv -keyalg RSA -keysize 2048 -validity 20000 \
-    -storepass freemytv -keypass freemytv -dname "CN=Free My TV" >/dev/null 2>&1
-fi
-"$BT/apksigner" sign --ks freemytv.keystore --ks-pass pass:freemytv --key-pass pass:freemytv --out FreeMyTV.apk out/aligned.apk
-echo "Built FreeMyTV.apk ($(du -h FreeMyTV.apk | cut -f1)). Install: adb install -r FreeMyTV.apk"
+# Signing: only with a persistent private key explicitly passed by the owner.
+# Passwords are supplied via env var names, NEVER in command arguments or logs.
+rm -f FreeMyProjector.apk
+"$BT/apksigner" sign --ks "$FMP_SIGNING_KEYSTORE" --ks-type PKCS12 \
+  --ks-key-alias "$FMP_SIGNING_KEY_ALIAS" \
+  --ks-pass env:FMP_SIGNING_STORE_PASSWORD \
+  --key-pass env:FMP_SIGNING_KEY_PASSWORD \
+  --out FreeMyProjector.apk out/aligned.apk
+"$BT/apksigner" verify --min-sdk-version 28 FreeMyProjector.apk
+echo "Built and verified FreeMyProjector.apk ($(du -h FreeMyProjector.apk | cut -f1))."
