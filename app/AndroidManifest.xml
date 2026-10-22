@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.freemytv"
-    android:versionCode="1"
-    android:versionName="1.0">
+    package="com.panasenkof.freemyprojector"
+    android:versionCode="1000"
+    android:versionName="0.1.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -42,8 +42,8 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <application
-        android:name=".App"
-        android:label="Free My TV"
+        android:name="io.freemytv.App"
+        android:label="FreeMyProjector"
         android:icon="@drawable/icon"
         android:banner="@drawable/banner"
         android:allowBackup="false"
@@ -51,12 +51,12 @@
 
         <!-- The app's icon opens the settings (switch between Free My TV and the original home screen). -->
         <activity
-            android:name=".SettingsActivity"
+            android:name="io.freemytv.SettingsActivity"
             android:process=":home"
             android:exported="true"
-            android:label="Free My TV"
+            android:label="FreeMyProjector"
             android:launchMode="singleTask"
-            android:taskAffinity="io.freemytv.settings"
+            android:taskAffinity="com.panasenkof.freemyprojector.settings"
             android:excludeFromRecents="true"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|density|fontScale|locale|layoutDirection"
@@ -71,10 +71,10 @@
         <!-- The home screen. Its own process (:home): if it ever crashes, the safety net in the main process still
              works. It only becomes the TV's home screen in Free My TV mode (cmd package set-home-activity). -->
         <activity
-            android:name=".HomeActivity"
+            android:name="io.freemytv.HomeActivity"
             android:process=":home"
             android:exported="true"
-            android:label="Free My TV"
+            android:label="FreeMyProjector"
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:stateNotNeeded="true"
@@ -92,11 +92,11 @@
         </activity>
 
         <service
-            android:name=".Screensaver"
+            android:name="io.freemytv.Screensaver"
             android:process=":home"
             android:enabled="@bool/dream_in_home"
             android:exported="true"
-            android:label="Free My TV"
+            android:label="FreeMyProjector"
             android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
@@ -106,10 +106,10 @@
 
         <!-- The same screensaver on Android 11, in the main process (see ScreensaverAlone). -->
         <service
-            android:name=".ScreensaverAlone"
+            android:name="io.freemytv.ScreensaverAlone"
             android:enabled="@bool/dream_alone"
             android:exported="true"
-            android:label="Free My TV"
+            android:label="FreeMyProjector"
             android:permission="android.permission.BIND_DREAM_SERVICE">
             <intent-filter>
                 <action android:name="android.service.dreams.DreamService" />
@@ -119,17 +119,17 @@
 
         <!-- The switches, as background jobs in the main process. -->
         <service
-            android:name=".ModeJob"
+            android:name="io.freemytv.ModeJob"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- The remote's app buttons from inside any app (Settings > Remote Buttons). Its own process: the system waits for it on
              every key, so the home screen must never be able to slow it down. -->
         <service
-            android:name=".RemoteKeyService"
+            android:name="io.freemytv.RemoteKeyService"
             android:process=":keys"
             android:exported="true"
-            android:label="Free My TV"
+            android:label="FreeMyProjector"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -140,7 +140,7 @@
         </service>
 
         <receiver
-            android:name=".HomeReceiver"
+            android:name="io.freemytv.HomeReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
