@@ -51,12 +51,29 @@ jobs:
           set -euo pipefail
           sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
 
+      - name: Verify identity, version policy and P-04 safety lock
+        run: python3 tools/ci/verify_identity.py
+
+      - name: Confirm legacy signing is fail-closed without secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The unsigned flag must be explicitly disabled to test refusal.
+          if env -u FMP_SIGNING_KEYSTORE -u FMP_SIGNING_STORE_PASSWORD -u FMP_SIGNING_KEY_ALIAS -u FMP_SIGNING_KEY_PASSWORD \
+              FMP_BUILD_UNSIGNED=0 ./build.sh > /tmp/fmp-no-signing.log 2>&1; then
+            echo "ERROR: build unexpectedly succeeded without private signing keys" >&2
+            exit 1
+          fi
+          grep -q 'Missing FMP_SIGNING_KEYSTORE' /tmp/fmp-no-signing.log
+          test ! -f FreeMyProjector.apk
+          test ! -e freemytv.keystore
+
       - name: Build without a keystore or signing keys
         run: |
           set -euo pipefail
           ./build.sh
           test -s out/aligned.apk
-          test ! -f FreeMyTV.apk
+          test ! -f FreeMyProjector.apk
           test ! -e freemytv.keystore
 
       - name: Verify ZIP, alignment, Android API and checksum
@@ -67,7 +84,7 @@ jobs:
           unzip -tqq out/aligned.apk
           "$BT/zipalign" -c -p 4 out/aligned.apk
           "$BT/aapt2" dump badging out/aligned.apk > out/ci-badging.txt
-          grep -Eq "^package: name='io\.freemytv'" out/ci-badging.txt
+          grep -Eq "^package: name='com\.fader\.freemyprojector'" out/ci-badging.txt
           grep -Fq "sdkVersion:'28'" out/ci-badging.txt
           grep -Fq "targetSdkVersion:'33'" out/ci-badging.txt
 
@@ -80,11 +97,11 @@ jobs:
             echo "Java: 17"
             echo "SDK platform: android-34"
             echo "Build Tools: 34.0.0"
-            echo "Package (temporary upstream): io.freemytv"
+            echo "Package: com.fader.freemyprojector"
             echo "Android minSdk: 28"
             echo "Android targetSdk: 33"
             echo "Hardware test: NOT PERFORMED"
-            echo "Signing + package identity will be done in P-03."
+            echo "Signed installation APK is available only through the manual release workflow, with private secrets."
           } > out/ci-artifacts/BUILD-REPORT.txt
           test ! -e freemytv.keystore
 
@@ -95,3 +112,29 @@ jobs:
           path: out/ci-artifacts/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Smoke-test signing with disposable CI key (never upload this APK)
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          test_dir="$(mktemp -d)"
+          trap 'rm -rf "$test_dir"; rm -f FreeMyProjector.apk' EXIT
+          secret="$(openssl rand -hex 24)"
+          keytool -genkeypair -noprompt -keystore "$test_dir/test.p12" \
+            -storetype PKCS12 -alias ci-throwaway -keyalg RSA -keysize 2048 \
+            -validity 1 -dname "CN=CI Throwaway" \
+            -storepass "$secret" -keypass "$secret" >/dev/null 2>&1
+          FMP_BUILD_UNSIGNED=0 \
+          FMP_SIGNING_KEYSTORE="$test_dir/test.p12" \
+          FMP_SIGNING_KEY_ALIAS=ci-throwaway \
+          FMP_SIGNING_STORE_PASSWORD="$secret" \
+          FMP_SIGNING_KEY_PASSWORD="$secret" \
+            ./build.sh > "$test_dir/signed-build.log" 2>&1 || {
+              echo "Disposable-key signing smoke test failed." >&2
+              exit 1
+            }
+          test -s FreeMyProjector.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --min-sdk-version 28 FreeMyProjector.apk
+          echo "PASS: signed using disposable key and verified. This APK will be deleted."
+          # Do not upload or cache the disposable private key or signed APK.

@@ -1,0 +1,125 @@
+name: Publish signed FreeMyProjector APK (manual)
+
+on:
+  workflow_dispatch:
+
+# This workflow is NEVER triggered from a PR or a normal push.
+permissions:
+  contents: read
+
+concurrency:
+  group: freemyprojector-signed-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release-signing
+    permissions:
+      contents: write
+    env:
+      FMP_BUILD_UNSIGNED: "0"
+      FMP_BUILD_TOOLS_VERSION: "34.0.0"
+      FMP_ANDROID_PLATFORM: "34"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install pinned Android tools
+        run: sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Check app ID, source classes, P-04 lock and release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/ci/verify_identity.py --github-output "$GITHUB_OUTPUT"
+          git fetch --tags --force origin
+          version="$(python3 -c 'from tools.ci.verify_identity import verify; print(verify()[0])')"
+          python3 tools/ci/check_release_version.py "v$version"
+
+      - name: Sign privately and verify Android 9 installability
+        shell: bash
+        env:
+          FMP_RELEASE_KEYSTORE_B64: ${{ secrets.FMP_RELEASE_KEYSTORE_B64 }}
+          FMP_SIGNING_STORE_PASSWORD: ${{ secrets.FMP_RELEASE_STORE_PASSWORD }}
+          FMP_SIGNING_KEY_ALIAS: ${{ secrets.FMP_RELEASE_KEY_ALIAS }}
+          FMP_SIGNING_KEY_PASSWORD: ${{ secrets.FMP_RELEASE_KEY_PASSWORD }}
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+          EXPECTED_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          for key in FMP_RELEASE_KEYSTORE_B64 FMP_SIGNING_STORE_PASSWORD FMP_SIGNING_KEY_ALIAS FMP_SIGNING_KEY_PASSWORD; do
+            if [ -z "${!key:-}" ]; then
+              echo "Missing required signing secret: $key (see docs/RELEASE_SIGNING.md)" >&2
+              exit 1
+            fi
+          done
+
+          umask 077
+          signing_file="$(mktemp "$RUNNER_TEMP/fmp-release-XXXXXXXX.p12")"
+          trap 'rm -f "$signing_file"' EXIT
+          printf '%s' "$FMP_RELEASE_KEYSTORE_B64" | base64 --decode > "$signing_file"
+          unset FMP_RELEASE_KEYSTORE_B64
+          test -s "$signing_file"
+          export FMP_SIGNING_KEYSTORE="$signing_file"
+          ./build.sh
+
+          BT="$ANDROID_HOME/build-tools/34.0.0"
+          test -s FreeMyProjector.apk
+          "$BT/apksigner" verify --min-sdk-version 28 --verbose FreeMyProjector.apk
+          "$BT/zipalign" -c -p 4 FreeMyProjector.apk
+          "$BT/aapt2" dump badging FreeMyProjector.apk > out/release-badging.txt
+          grep -Eq "^package: name='com\.fader\.freemyprojector'" out/release-badging.txt
+          grep -Fq "versionName='$EXPECTED_VERSION'" out/release-badging.txt
+          grep -Fq "sdkVersion:'28'" out/release-badging.txt
+          grep -Fq "targetSdkVersion:'33'" out/release-badging.txt
+
+          mkdir -p out/release-assets
+          cp FreeMyProjector.apk "out/release-assets/FreeMyProjector-$EXPECTED_TAG.apk"
+          (cd out/release-assets && sha256sum "FreeMyProjector-$EXPECTED_TAG.apk" > SHA256SUMS.txt)
+          {
+            echo "Application: FreeMyProjector"
+            echo "Package: com.fader.freemyprojector"
+            echo "Version: $EXPECTED_VERSION"
+            echo "Commit: $GITHUB_SHA"
+            echo "Signed APK: verified with Android SDK apksigner"
+            echo "Minimum Android SDK: 28 (Android 9)"
+            echo "P-04 HOME safety lock: ENABLED (switch unavailable)"
+            echo "MiProjM05 actual device installation: NOT TESTED"
+          } > out/release-assets/BUILD-REPORT.txt
+          test ! -e freemytv.keystore
+          echo "Private keystore is temporary and excluded from published artifacts."
+
+      - name: Publish signed APK as prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Do not silently replace a release built with another key/commit.
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" \
+            out/release-assets/FreeMyProjector-"$RELEASE_TAG".apk \
+            out/release-assets/SHA256SUMS.txt \
+            out/release-assets/BUILD-REPORT.txt \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "FreeMyProjector $RELEASE_TAG (pre-release)" \
+            --notes "Signed Android 9 APK. Factory HOME switching is disabled pending P-04. MiProjM05 installation and remote control are not yet tested (P-05). Keep the original signing key to allow updates."

@@ -14,8 +14,13 @@ import android.os.PersistableBundle;
  */
 public class ModeJob extends JobService {
     static final String APPLY = "apply", VERIFY = "verify", REVERT = "revert", MEMORY = "memory", REMOTE = "remote";
+    // Explicit safety lock: remain false until P-04 validates factory launcher rollback.
+    // Stops ALL ADB-backed jobs, including boot/update/recovery jobs. Do not toggle
+    // for a release before confirming behavior on the actual Xiaomi firmware.
+    static final boolean PROJECTOR_HOME_SWITCH_AUDITED = false;
 
     @Override public boolean onStartJob(JobParameters params) {
+        if (!PROJECTOR_HOME_SWITCH_AUDITED) return false;
         PersistableBundle extras = params.getExtras();
         final String action = extras.getString("action", "");
         final String mode = extras.getString("mode", "");
@@ -44,6 +49,7 @@ public class ModeJob extends JobService {
 
     /** Schedules a job (one pending per action: a new request replaces the old one). */
     static void schedule(Context c, String action, String mode, long delayMs) {
+        if (!PROJECTOR_HOME_SWITCH_AUDITED) return;
         JobScheduler scheduler = c.getSystemService(JobScheduler.class);
         if (scheduler == null) return;
         PersistableBundle extras = new PersistableBundle();

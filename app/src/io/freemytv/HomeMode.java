@@ -33,11 +33,13 @@ import java.util.regex.Pattern;
 final class HomeMode {
     private HomeMode() {}
 
-    static final String PKG = "io.freemytv";
-    static final String HOME_ACTIVITY = PKG + "/" + PKG + ".HomeActivity";
-    static final String SETTINGS_ACTIVITY = PKG + "/" + PKG + ".SettingsActivity";
+    /** Installed Android package differs from the original Java namespace. */
+    static final String PKG = "com.fader.freemyprojector";
+    static final String JAVA_CLASS_PREFIX = "io.freemytv.";
+    static final String HOME_ACTIVITY = PKG + "/" + JAVA_CLASS_PREFIX + "HomeActivity";
+    static final String SETTINGS_ACTIVITY = PKG + "/" + JAVA_CLASS_PREFIX + "SettingsActivity";
     /** Our screensaver: on Android 11 the copy that runs in the main process (ScreensaverAlone, #10). */
-    static final String DREAM = PKG + "/" + PKG + (Build.VERSION.SDK_INT == 30 ? ".ScreensaverAlone" : ".Screensaver");
+    static final String DREAM = PKG + "/" + JAVA_CLASS_PREFIX + (Build.VERSION.SDK_INT == 30 ? "ScreensaverAlone" : "Screensaver");
     static final String FREE = "free", ORIGINAL = "original";
 
     /** Classic Android TV's home screen; its recommendations service crashes on the screensaver while it's off (#11). */
@@ -116,6 +118,12 @@ final class HomeMode {
 
     /** Asks the main process to switch (the settings screen calls this). */
     static void request(Context c, String mode) {
+        // P-04 safety gate: no launcher, Wi-Fi, package or screensaver changes
+        // until rollback has been audited on Xiaomi MiProjM05.
+        if (!ModeJob.PROJECTOR_HOME_SWITCH_AUDITED) {
+            notice(c, "Home switching is disabled pending Xiaomi safety verification (P-04).");
+            return;
+        }
         ModeJob.schedule(c, ModeJob.APPLY, mode, 0);
     }
 
@@ -153,7 +161,7 @@ final class HomeMode {
         }
     }
 
-    private static final String REMOTE_SERVICE = PKG + "/" + PKG + ".RemoteKeyService";
+    private static final String REMOTE_SERVICE = PKG + "/" + JAVA_CLASS_PREFIX + "RemoteKeyService";
     private static final Pattern SERVICE = Pattern.compile("[\\w.]+/[\\w.$]+");
 
     /** Adds ours to the enabled accessibility services (keeping the others, like TalkBack), or takes it out. */

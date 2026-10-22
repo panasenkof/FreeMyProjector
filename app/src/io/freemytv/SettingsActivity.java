@@ -38,9 +38,9 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Free My TV's settings (the app's icon, "All Apps", or the gear on the home screen), in the style of Apple TV's
+ * FreeMyProjector's settings (the app's icon, "All Apps", or the gear on the home screen), in the style of Apple TV's
  * settings: the big symbol and title on the left, the list on the right with the focused row in white. "Home screen"
- * opens the Free My TV / Original choice (with a check on the current one); the switch runs in the main process
+ * opens the FreeMyProjector / Original choice (with a check on the current one); the switch runs in the main process
  * (HomeMode) and this screen only asks for it and follows the state file.
  */
 public class SettingsActivity extends Activity {
@@ -176,7 +176,7 @@ public class SettingsActivity extends Activity {
             scene.setMotion(0.5f, 0.2f);
             scene.applyPalette();
             setFocusable(true);
-            setContentDescription("Free My TV");
+            setContentDescription("FreeMyProjector");
             // TalkBack: one item per row, id = row + 1.
             spoken = new Spoken(this, new Spoken.Source() {
                 @Override public void items(List<Integer> out) { for (int i = 1; i <= rowCount(); i++) out.add(i); }
@@ -206,7 +206,7 @@ public class SettingsActivity extends Activity {
                     if (row == 0) {
                         String busyText = busyText();
                         String value = busy() ? (busyText.isEmpty() ? Ui.tr("Começando…", "Starting…") : busyText)
-                                : freeActive() ? "Free My TV" : Ui.tr("Original", "Original");
+                                : freeActive() ? "FreeMyProjector" : Ui.tr("Original", "Original");
                         return Ui.tr("Início, ", "Home Screen, ") + value;
                     }
                     String[] names = {Ui.tr("Tela de Descanso, ver agora", "Screensaver, preview"), Ui.tr("Ajustes do Início", "Home Settings"),
@@ -214,7 +214,7 @@ public class SettingsActivity extends Activity {
                     return row - 1 < names.length ? names[row - 1] : "";
                 }
                 case HOME_CHOICE: {
-                    String name = row == 0 ? "Free My TV, " + Ui.tr("sem anúncios, com a tela de descanso nova", "no ads, with the new screensaver")
+                    String name = row == 0 ? "FreeMyProjector, " + Ui.tr("sem anúncios, com a tela de descanso nova", "no ads, with the new screensaver")
                             : "Original, " + Ui.tr("o Início de fábrica da TV", "the TV's factory home screen");
                     boolean inUse = (row == 0) == freeActive();
                     return name + (inUse ? Ui.tr(". Em uso", ". In use") : "") + ", " + (row + 1) + Ui.tr(" de 2", " of 2");
@@ -361,7 +361,7 @@ public class SettingsActivity extends Activity {
             // On the left: big symbol, title, description.
             float cx = 500 * k;
             Symbols.draw(getContext(), c, "sparkles", cx, 400 * k, 150 * k, 0xEBFFFFFF);
-            c.drawText("Free My TV", cx, 612 * k, title);
+            c.drawText("FreeMyProjector", cx, 612 * k, title);
             c.drawText(Ui.tr("Início e tela de descanso da TV", "Your TV's home screen and screensaver"), cx, 660 * k, subtitle);
             c.drawText(versionName(getContext()), cx, 704 * k, version);
 
@@ -371,7 +371,7 @@ public class SettingsActivity extends Activity {
         private void drawMain(Canvas c, float seconds) {
             boolean working = busy();
             String busyText = busyText();
-            String mode = freeActive() ? "Free My TV" : Ui.tr("Original", "Original");
+            String mode = freeActive() ? "FreeMyProjector" : Ui.tr("Original", "Original");
             String[] labels = {Ui.tr("Início", "Home Screen"), Ui.tr("Tela de Descanso", "Screensaver"),
                     Ui.tr("Ajustes do Início", "Home Settings"), Ui.tr("Prateleira", "Shelf"),
                     Ui.tr("Botões do Controle", "Remote Buttons"), Ui.tr("Ajustes da TV", "TV Settings")};
@@ -472,7 +472,7 @@ public class SettingsActivity extends Activity {
             c.drawText(Ui.tr("COMPARAÇÃO", "COMPARISON"), x, y, header);
             cellValue.setColor(0x73FFFFFF);
             c.drawText(Ui.tr("Original", "Original"), colA, y, cellValue);
-            c.drawText("Free My TV", colB, y, cellValue);
+            c.drawText("FreeMyProjector", colB, y, cellValue);
             cellValue.setColor(0xD9FFFFFF);
             JSONObject metrics = state.optJSONObject("metrics");
             JSONObject a = metrics == null ? null : metrics.optJSONObject(HomeMode.ORIGINAL);
@@ -503,11 +503,11 @@ public class SettingsActivity extends Activity {
             if (shown == 0) c.drawText(Ui.tr("Nenhum ainda.", "None yet."), x, y + 42 * k, notice);
         }
 
-        /** Home screen choice: Free My TV or the original, with a check on the one in use. */
+        /** Home screen choice: FreeMyProjector or the original, with a check on the one in use. */
         private void drawChoice(Canvas c) {
             Paint heading = Ui.text(Ui.displaySemibold, 34 * k, 0xFFFFFFFF);
             c.drawText(Ui.tr("Início", "Home Screen"), LIST_X * k + 30 * k, (LIST_TOP - 24) * k, heading);
-            String[][] options = {{"Free My TV", Ui.tr("Sem anúncios, com a tela de descanso nova", "No ads, with the new screensaver")},
+            String[][] options = {{"FreeMyProjector", Ui.tr("Sem anúncios, com a tela de descanso nova", "No ads, with the new screensaver")},
                     {Ui.tr("Original", "Original"), Ui.tr("O Início de fábrica da TV", "The TV's factory home screen")}};
             int current = freeActive() ? 0 : 1;
             for (int i = 0; i < 2; i++) {
@@ -554,9 +554,9 @@ public class SettingsActivity extends Activity {
 
         private static String versionName(Context c) {
             try {
-                return "Free My TV " + c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionName;
+                return "FreeMyProjector " + c.getPackageManager().getPackageInfo(c.getPackageName(), 0).versionName;
             } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-                return "Free My TV";
+                return "FreeMyProjector";
             }
         }
 
