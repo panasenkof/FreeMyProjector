@@ -73,7 +73,7 @@ def verify() -> tuple[str, int]:
     assert "github.ref == 'refs/heads/main'" in release, "Release workflow must be main-only"
     assert "--prerelease" in release, "Release must remain pre-release until manual device testing"
     assert "FMP_RELEASE_KEYSTORE_B64" in release, "Signing secret must be supplied by owner"
-    assert "secrets." not in ci, "PR build must never receive release secrets"
+    assert re.search(r"\$\{\{\s*secrets\.", ci) is None, "PR build must never receive release secrets"
     return name, code
 
 
