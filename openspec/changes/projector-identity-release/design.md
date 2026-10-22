@@ -1,7 +1,7 @@
 # Design P-03
 
 ## Идентичность
-- APK package: `com.panasenkof.freemyprojector`; Android display name: `FreeMyProjector`.
+- APK package: `com.fader.freemyprojector`; Android display name: `FreeMyProjector`.
 - Java namespace исходника остаётся `io.freemytv`: это минимизирует большой ненужный рефакторинг. В AndroidManifest **все class android:name абсолютные**, например `io.freemytv.HomeActivity` и `io.freemytv.App`.
 - `HomeMode.PKG` меняется на новый ID, а построение ComponentName использует отдельный `COMPONENT_CLASS_PREFIX="io.freemytv."`; не смешивать package и Java-class.
 - Никаких команд смены HOME, подстраиваем только имена и намеренно сохраняем rollback-этап P-04.
