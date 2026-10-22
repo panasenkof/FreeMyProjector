@@ -13,7 +13,7 @@
 | V-03 | SDD-документы добавлены (PR #2 объединён); для P-01 согласован ручной вариант + read-only Windows-скрипт | [Инструкция](docs/SDD_GUIDE.md); [P-01](openspec/changes/device-compatibility-audit/proposal.md) | Владелец согласовал формат P-01 | ✅ Согласовано, PR #2 merged |
 | V-04 | Исходный механизм переключения лаунчера заявлен в Free My TV | **Пока не запускать переключение.** Проверка запланирована после диагностики и согласования безопасного отката | Совместная проверка на устройстве | ⏳ Не проверено |
 
-**Не считать выполненным:** получение подписанного установочного/обновляемого APK, установку и работу приложения на Xiaomi, безопасный откат, работу YouTube, настройку сети и реальную ADB-диагностику. P-02 подтвердил только компиляцию неподписанного APK на Linux CI, не Windows CI и не работу на проекторе. P-01 ранее проверен через mock-ADB.
+**Не считать выполненным:** получение подписанного установочного/обновляемого APK, установку и работу приложения на Xiaomi, безопасный откат, работу YouTube, настройку сети и реальную ADB-диагностику. P-03 запрещает запуск HOME/ADB-фоновых задач до P-04; P-03 release не был выполнен с личным ключом. P-02 подтвердил только компиляцию неподписанного APK на Linux CI, не Windows CI и не работу на проекторе. P-01 ранее проверен через mock-ADB.
 
 ## 2. Что делаем дальше — по приоритету и зависимостям
 
@@ -23,8 +23,8 @@
 |---|---|---|---|---|
 | P-00 | P0 | Принять правила SDD, единый план и шаблоны проверок | [PR #2](https://github.com/panasenkof/FreeMyProjector/pull/2), [инструкция](docs/SDD_GUIDE.md) | ✅ Слито, SDD введён |
 | P-01 | P0 | Пассивная диагностика модели, прошивки, Android/ADB и доступных HOME-компонентов **без изменений** | [Спецификация](openspec/changes/device-compatibility-audit/proposal.md), [инструкция Windows](docs/DEVICE_DIAGNOSTICS_WINDOWS.md), [PR #3](https://github.com/panasenkof/FreeMyProjector/pull/3) | ✅ CI (mock) + ✅ ручная идентификация `MiProjM05`; ⏳ ADB-скрипт на настоящем устройстве и HOME-компонент не проверены |
-| P-02 | P0 | Проверочная сборка Android на Linux CI; поддержка Windows — локальная сборка по наследуемому `build.sh`, отдельная CI-матрица Windows пока не запускалась | [Спецификация P-02](openspec/changes/android-apk-ci/proposal.md), [инструкция](docs/ANDROID_CI_BUILD.md), [PR #5](https://github.com/panasenkof/FreeMyProjector/pull/5) | ✅ OpenSpec и Android Linux CI; неподписанный APK с SHA256; ⏳ слияние PR; **не готов к установке** |
-| P-03 | P0 | Собственный package ID, имя FreeMyProjector, управляемая подпись APK, безопасная миграция обновлений | Отдельный change; проверить текущее `io.freemytv` и `freemytv.keystore`, не заливать секреты | В очереди |
+| P-02 | P0 | Воспроизводимая Android-сборка на Linux CI: компиляция, ZIP, zipalign, Android SDK/версия, SHA256; Windows CI пока не вводился | [Спецификация P-02](openspec/changes/android-apk-ci/proposal.md), [инструкция](docs/ANDROID_CI_BUILD.md), [PR #5](https://github.com/panasenkof/FreeMyProjector/pull/5) | ✅ PR #5 слит, unsigned CI подтверждён |
+| P-03 | P0 | Собственный пакет `com.panasenkof.freemyprojector`, имя, versionCode, приватная подпись и ручной prerelease | [OpenSpec P-03](openspec/changes/projector-identity-release/proposal.md), [инструкция ключей Windows](docs/RELEASE_SIGNING.md), [PR #6](https://github.com/panasenkof/FreeMyProjector/pull/6) | Реализация в PR, автотесты запускаются; **для установочного релиза нужны секреты владельца и ручной запуск** |
 | P-04 | P0 | Аудит безопасности переключения HOME: восстановление штатного Xiaomi Launcher, аварийный выход и откат по ADB | Отдельный change; зависит от P-01; **до** любых системных переключений | В очереди |
 | P-05 | P0 | Первый контролируемый запуск и ручной чек-лист: установка без замены HOME → пульт → сон/перезагрузка → восстановление | Отдельный change; зависит от P-01…P-04, согласие владельца на тест | В очереди |
 | P-06 | P1 | Xiaomi-специфичная оболочка: управление фокусом, список приложений, персональные настройки, локализация RU | Отдельный change после P-05 | В очереди |
@@ -91,4 +91,5 @@
 | 2026-10-21 / 0.2 | Единый план и приоритеты; SDD/OpenSpec; первый change по безопасности диагностирования; PR #2 merged |
 | 2026-10-21 / 0.3 | P-01: PowerShell read-only + ручная инструкция, тесты CI; PR #3 merged |
 | 2026-10-22 / 0.4 | Фото MiProjM05 / Android 9 / прошивка зарегистрированы; PR #4 merged; ADB/HOME отдельно |
-| 2026-10-22 / 0.5 (PR #5) | P-02 — OpenSpec и Android Linux CI подтверждены, unsigned build artifacts и SHA256; P-03 по идентичности и приватной подписи остаётся обязательным до установки |
+| 2026-10-22 / 0.5 | P-02 OpenSpec + Linux CI, PR #5 merged; без установки на проектор |
+| 2026-10-22 / 0.6 (PR #6) | P-03: отдельный package ID, имя, безопасный signing workflow и защита HOME. Установочный релиз требует собственных секретов и ручного запуска |
