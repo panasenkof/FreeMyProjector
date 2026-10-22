@@ -33,7 +33,10 @@ def verify() -> tuple[str, int]:
     application = root.find("application")
     assert application is not None, "Missing Android application element"
     assert application.attrib.get(ANDROID + "label") == "FreeMyProjector", "Wrong application label"
-    seen = set()
+    app_class = application.attrib.get(ANDROID + "name", "")
+    assert app_class == "io.freemytv.App", f"Wrong application Java class: {app_class}"
+    assert (ROOT / "app/src/io/freemytv/App.java").is_file(), "Missing Application Java class"
+    seen = {"App"}
     for component in application:
         if component.tag not in ("activity", "service", "receiver"):
             continue
