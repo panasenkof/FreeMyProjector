@@ -34,7 +34,7 @@ final class HomeMode {
     private HomeMode() {}
 
     /** Installed Android package differs from the original Java namespace. */
-    static final String PKG = "com.panasenkof.freemyprojector";
+    static final String PKG = "com.fader.freemyprojector";
     static final String JAVA_CLASS_PREFIX = "io.freemytv.";
     static final String HOME_ACTIVITY = PKG + "/" + JAVA_CLASS_PREFIX + "HomeActivity";
     static final String SETTINGS_ACTIVITY = PKG + "/" + JAVA_CLASS_PREFIX + "SettingsActivity";
