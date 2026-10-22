@@ -63,6 +63,17 @@ def verify() -> tuple[str, int]:
     assert "env:FMP_SIGNING_STORE_PASSWORD" in build, "Keystore password must come from env"
     assert "env:FMP_SIGNING_KEY_PASSWORD" in build, "Key password must come from env"
     assert "FMP_BUILD_UNSIGNED" in build, "Unsigned PR CI mode removed"
+    assert "--custom-package io.freemytv" in build, "Java R namespace does not match sources"
+    assert "if (!ModeJob.PROJECTOR_HOME_SWITCH_AUDITED)" in homemode, "User-facing HOME request guard missing"
+    release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
+    ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
+    assert "pull_request:" not in release, "PR must never trigger signed releases"
+    assert "push:" not in release, "Push must never trigger signed releases"
+    assert "github.ref == 'refs/heads/main'" in release, "Release workflow must be main-only"
+    assert "--prerelease" in release, "Release must remain pre-release until manual device testing"
+    assert "FMP_RELEASE_KEYSTORE_B64" in release, "Signing secret must be supplied by owner"
+    assert "secrets." not in ci, "PR build must never receive release secrets"
     return name, code
 
 
