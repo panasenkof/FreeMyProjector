@@ -81,7 +81,6 @@ def verify() -> tuple[str, int]:
         "app/src/io/freemytv/HomeMode.java",
         ".github/workflows/android-build.yml",
         ".github/workflows/signed-release.yml",
-        "tools/ci/verify_identity.py",
     ):
         assert "com.panasenkof.freemyprojector" not in (
             ROOT / package_file
