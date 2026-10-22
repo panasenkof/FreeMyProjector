@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.panasenkof.freemyprojector"
+    package="com.fader.freemyprojector"
     android:versionCode="1000"
     android:versionName="0.1.0">
 
@@ -56,7 +56,7 @@
             android:exported="true"
             android:label="FreeMyProjector"
             android:launchMode="singleTask"
-            android:taskAffinity="com.panasenkof.freemyprojector.settings"
+            android:taskAffinity="com.fader.freemyprojector.settings"
             android:excludeFromRecents="true"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|smallestScreenSize|uiMode|density|fontScale|locale|layoutDirection"
