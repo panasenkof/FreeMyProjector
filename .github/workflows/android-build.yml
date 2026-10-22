@@ -105,6 +105,32 @@ jobs:
           } > out/ci-artifacts/BUILD-REPORT.txt
           test ! -e freemytv.keystore
 
+      - name: Smoke-test signing with disposable CI key (never upload this APK)
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          test_dir="$(mktemp -d)"
+          trap 'rm -rf "$test_dir"; rm -f FreeMyProjector.apk' EXIT
+          secret="$(openssl rand -hex 24)"
+          keytool -genkeypair -noprompt -keystore "$test_dir/test.p12" \
+            -storetype PKCS12 -alias ci-throwaway -keyalg RSA -keysize 2048 \
+            -validity 1 -dname "CN=CI Throwaway" \
+            -storepass "$secret" -keypass "$secret" >/dev/null 2>&1
+          FMP_BUILD_UNSIGNED=0 \
+          FMP_SIGNING_KEYSTORE="$test_dir/test.p12" \
+          FMP_SIGNING_KEY_ALIAS=ci-throwaway \
+          FMP_SIGNING_STORE_PASSWORD="$secret" \
+          FMP_SIGNING_KEY_PASSWORD="$secret" \
+            ./build.sh > "$test_dir/signed-build.log" 2>&1 || {
+              echo "Disposable-key signing smoke test failed." >&2
+              exit 1
+            }
+          test -s FreeMyProjector.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --min-sdk-version 28 FreeMyProjector.apk
+          echo "PASS: signed using disposable key and verified. This APK will be deleted."
+          # Do not upload or cache the disposable private key or signed APK.
+
       - name: Upload compilation artifact (NOT installable)
         uses: actions/upload-artifact@v4
         with:
