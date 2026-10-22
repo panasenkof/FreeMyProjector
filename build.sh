@@ -4,6 +4,9 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Never leave a previously signed APK in place if this invocation fails.
+rm -f FreeMyProjector.apk FreeMyTV.apk
+
 # Fail closed: no signing unless the user explicitly supplied a private keystore.
 if [ "${FMP_BUILD_UNSIGNED:-0}" != "1" ]; then
   for required in FMP_SIGNING_KEYSTORE FMP_SIGNING_KEY_ALIAS FMP_SIGNING_STORE_PASSWORD FMP_SIGNING_KEY_PASSWORD; do
