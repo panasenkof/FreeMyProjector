@@ -73,6 +73,19 @@ def verify() -> tuple[str, int]:
     assert "github.ref == 'refs/heads/main'" in release, "Release workflow must be main-only"
     assert "--prerelease" in release, "Release must remain pre-release until manual device testing"
     assert "FMP_RELEASE_KEYSTORE_B64" in release, "Signing secret must be supplied by owner"
+    # Protect release metadata and package regex checks against partial renames.
+    assert r"com\.fader\.freemyprojector" in release, "Signed release checks wrong package"
+    assert r"com\.fader\.freemyprojector" in ci, "Unsigned build checks wrong package"
+    for package_file in (
+        "app/AndroidManifest.xml",
+        "app/src/io/freemytv/HomeMode.java",
+        ".github/workflows/android-build.yml",
+        ".github/workflows/signed-release.yml",
+        "tools/ci/verify_identity.py",
+    ):
+        assert "com.panasenkof.freemyprojector" not in (
+            ROOT / package_file
+        ).read_text(encoding="utf-8"), f"Stale package ID in {package_file}"
     assert re.search(r"\$\{\{\s*secrets\.", ci) is None, "PR build must never receive release secrets"
     return name, code
 
