@@ -1,6 +1,6 @@
 # Instructions for AI agents — FreeMyProjector
 
-This repository is an **independent MIT-licensed adaptation** of [Free My TV](https://github.com/simbasjungles/free-my-tv) for a Xiaomi Mi Smart Compact Projector (reported MJJGTYDS02FM; **model and firmware not yet confirmed**). Treat `UPSTREAM.md` as provenance.
+This repository is an **independent MIT-licensed adaptation** of [Free My TV](https://github.com/simbasjungles/free-my-tv) for a Xiaomi Mi Smart Compact Projector (**system-reported MiProjM05**, Android 9, build `PQ3B.190705.003.4185`; retail SKU MJJGTYDS02FM not confirmed). Treat `UPSTREAM.md` as provenance.
 
 ## Sources of truth
 1. `PLAN.md` — canonical priorities, status and pending user confirmations.
@@ -28,7 +28,8 @@ Keep upstream `CLAUDE.md` for historical guidance, **but do not follow its model
 - Backward-compatible, recoverable updates are mandatory. Preserving access to the factory home screen is a P0 requirement.
 - Keep privacy and secrets out of Git, logs and PRs: no API keys, private tokens, keystores, device serials, MAC addresses or user network addresses.
 - This is initially Android TV / Android 9; keep the existing Java, no-Gradle `build.sh` build unless the spec justifies changing it.
-- Current manifest package is `io.freemytv`, and existing script generates `freemytv.keystore`. **Do not distribute an APK or introduce CI signing with that existing hard-coded shared password**. First design a private, persistent signing strategy and unique package identity.
+- P-03 identity: manifest app ID `com.panasenkof.freemyprojector`, original Java package `io.freemytv` (absolute component class names), release signing only with private owner-controlled PKCS12 credentials. **Do not reintroduce hard-coded signing keys or passwords**. Ordinary PR builds remain unsigned and use no release secrets. See [docs/RELEASE_SIGNING.md](docs/RELEASE_SIGNING.md).
+- P-04 is not audited: `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED` MUST remain `false`, and ADB-backed jobs must remain gated until the exact Xiaomi firmware's rollback mechanism is reviewed and explicitly approved. A successful P-03 build does not authorize activating HOME mode.
 - YouTube network performance is independent of home launcher replacement; diagnose before recommending changes. Never claim a VPN/proxy improves performance without local evidence.
 - Preserve original MIT license and author notice for reused code.
 
