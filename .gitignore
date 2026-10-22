@@ -15,3 +15,11 @@ __pycache__/
 
 # Local hardware diagnostics (do not commit unique device data)
 *device-info.local.json
+
+# Private signing keys and their copies (never publish)
+*.p12
+*.pfx
+*.jks
+*.key
+*keystore*.b64
+*.signing-secret
