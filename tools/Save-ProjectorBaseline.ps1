@@ -41,8 +41,8 @@ function Read-Property([string]$Key) {
     return $v
 }
 function Read-Packages {
-    param([string[]]$Args, [switch]$AllowEmpty)
-    $output = Read-Adb -Arguments $Args -AllowEmpty:$AllowEmpty
+    param([string[]]$Query, [switch]$AllowEmpty)
+    $output = Read-Adb -Arguments $Query -AllowEmpty:$AllowEmpty
     $set = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
     if ([string]::IsNullOrWhiteSpace($output)) {
         if (-not $AllowEmpty) { Fail 'Missing package list' }
@@ -112,7 +112,7 @@ if (-not $claimants.Contains('com.google.android.tvlauncher/.MainActivity')) {
     Fail 'Factory HOME absent from HOME claimant query'
 }
 
-$all = Read-Packages -Args @('shell','pm','list','packages')
+$all = Read-Packages -Query @('shell','pm','list','packages')
 $disabled = Read-Packages -Args @('shell','pm','list','packages','-d') -AllowEmpty
 $enabled = Read-Packages -Args @('shell','pm','list','packages','-e')
 foreach ($name in $disabled) {
