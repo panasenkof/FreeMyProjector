@@ -158,15 +158,19 @@ $basename = 'MiProjM05-baseline-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss
 $folder = Join-Path $dest $basename
 if (Test-Path -LiteralPath $folder) { Fail 'Backup path already exists' }
 [void](New-Item -ItemType Directory -Path $folder -ErrorAction Stop)
+$stage = 'create-json'
 try {
     $path = Join-Path $folder 'baseline.private.json'
     $json = ConvertTo-Json -InputObject $record -Depth 8
     [IO.File]::WriteAllText($path,$json+[Environment]::NewLine,(New-Object System.Text.UTF8Encoding($false)))
+    $stage = 'hash'
     $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
     [IO.File]::WriteAllText((Join-Path $folder 'SHA256SUMS.txt'),
         ($hash+'  baseline.private.json'+[Environment]::NewLine),
         (New-Object System.Text.UTF8Encoding($false)))
+    $stage = 'verify-json'
     $verified = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
+    $stage = 'verify-integrity'
     if ($verified.home.resolved -cne $homeCandidates[0] -or
         $verified.package_states.PSObject.Properties.Count -ne $all.Count -or
         (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) {
@@ -175,7 +179,7 @@ try {
 }
 catch {
     Remove-Item -LiteralPath $folder -Recurse -Force -ErrorAction SilentlyContinue
-    Fail 'Cannot write or verify the local backup'
+    Fail ('Cannot write or verify the local backup [' + $stage + '/' + $_.Exception.GetType().Name + ']')
 }
 [pscustomobject]@{
     status = 'saved'
