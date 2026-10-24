@@ -108,7 +108,22 @@ final class HomeMode {
         "mitv.service", "com.mi.bluetooth", "com.mitv.livetv.ci_mediatek", "com.xiaomi.tvqs.overseas",
         "com.mitv.tvlock", "com.xiaomi.mitv.updateservice", "com.xiaomi.android.tvsetup.partnercustomizer",
         "com.mitv.overseaservice", "com.xiaomi.mitv.tvmanager", "com.xiaomi.wfdsinkhelperservice",
-        "com.mitv.milinkservice", "com.xiaomi.mitv.smartshare", "android.autoinstalls.config.xiaomi.amelie"));
+        "com.mitv.milinkservice", "com.xiaomi.mitv.smartshare", "android.autoinstalls.config.xiaomi.amelie",
+        // MiProjM05/eva, firmware PQ3B.190705.003.4185: observed installed on 2026-10-24.
+        // Keep the OEM stack AND a known-good stock HOME available as recovery.
+        // Package names alone do not establish hardware dependencies or safe entry points.
+        "com.fengmi.projector.imaging", "com.fengmi.fmsettings", "com.fengmi.platform",
+        "com.fengmi.autofocustest", "com.fengmi.projector135MGN",
+        "com.fengmi.projector045G", "com.fengmi.projector055G", "com.fengmi.testsuite",
+        "com.google.android.tvlauncher", "com.google.android.leanbacklauncher",
+        "com.google.android.tvrecommendations", "com.google.android.leanbacklauncher.recommendations",
+        "android.autoinstalls.config.xiaomi"));
+
+    /** Future-proof Xiaomi safety: do not disable unknown Fengmi/Formovie packages. */
+    private static boolean isProtectedPackage(String pkg) {
+        return pkg != null && (PROTECTED.contains(pkg) || pkg.startsWith("com.fengmi.")
+                || pkg.startsWith("com.formovie.") || pkg.startsWith("cn.formovie."));
+    }
 
     /** One switch at a time (jobs can overlap: a boot check and a button press). */
     private static final Object RUN = new Object();
@@ -254,7 +269,7 @@ final class HomeMode {
             for (String pkg : targets) {
                 done++;
                 busy(c, Ui.tr("Desligando apps (", "Turning off apps (") + done + "/" + targets.size() + ")…");
-                if (PROTECTED.contains(pkg) || !present.contains(pkg) || owners.contains(pkg)) continue;
+                if (isProtectedPackage(pkg) || !present.contains(pkg) || owners.contains(pkg)) continue;
                 String out = adb.shell("pm disable-user --user 0 " + pkg);
                 if (out.contains("disabled-user")) {
                     disabled.add(pkg);
@@ -414,7 +429,7 @@ final class HomeMode {
                 }
                 Set<String> disabled = new HashSet<>(stringList(s, "disabled"));
                 for (String pkg : sorted(wanted)) {
-                    if (PROTECTED.contains(pkg) || !present.contains(pkg) || owners.contains(pkg)) continue;
+                    if (isProtectedPackage(pkg) || !present.contains(pkg) || owners.contains(pkg)) continue;
                     if (disabledNow.contains(pkg)) {
                         disabled.add(pkg);
                         continue;
