@@ -38,6 +38,8 @@
 
 **P-04A, следующая веха (24.10.2026):** получены точные имена Activity для Focus, Keystone, AutoKeystone, ImagingFeature и HDMI-settings (`dumpsys package`). См. [карту Activity](docs/MIPROJM05_ACTIVITY_DISCOVERY.md). Следующий шаг — подтвердить флаги `exported`, `permission`, `targetActivity` и Intent-фильтры без запуска и смены HOME; приёмка внешнего открытия только после отдельного согласования.
 
+**P-04A — подтверждение action-фильтров (24.10.2026):** read-only `dumpsys package` показал точные `START_FOCUS`, `START_KEYSTONE`, `START_AUTO_KEYSTONE`, `GUIDE_START` (+ `MAIN` для ImagingFeatureActivity) на нашей `.4185`. Не запускались. `exported`, `permission` и alias targets пока не проверены. [Карта и локальный manifest-check](docs/MIPROJM05_ACTIVITY_DISCOVERY.md). Прежде чем добавлять кнопки P-06, проверить доступ через обычное приложение. Не путать auto-keystone с автоматической калибровкой.
+
 **Дополнение OEM-аудита (24.10.2026):** повторный отфильтрованный ADB-вывод подтвердил 18 пакетов, включая `com.droidlogic.tvinput`, `com.formovie.fmutils`, `com.formovie.gsettings`, `com.formovie.launchboard`, `com.android.camera2`, остальные Droidlogic/Fengmi. См. [P-04 аудит](docs/P04_HOME_SAFETY_AUDIT.md). Добавлен консервативный guard этих компонентов в HomeMode и статическая проверка в CI; блокировка HOME остаётся закрытой. **Не путать инвентаризацию с аппаратной проверкой фокуса/трапеции/HDMI и безопасным откатом.**
 
 ### Исследование аналогов для P-04A/P-04/P-06/P-07

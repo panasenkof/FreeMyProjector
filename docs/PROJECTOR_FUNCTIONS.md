@@ -26,7 +26,11 @@
 
 Вывод `dumpsys package` подтвердил записи резолвера `com.fengmi.projector.imaging/.alias.FocusActivity`, `.alias.KeystoneActivity`, `.alias.AutoKeystoneActivity`, `.alias.GuideActivity`, `.access.ImagingFeatureActivity`. Найден также `com.formovie.gsettings/.ui.activity.MainActivity` и несколько экранов `com.droidlogic.tvinput` (`TvSettingsActivity`, `HdmiExtendSetupActivity` и другие). **Точные классы найдены; публичный доступ (`exported`, права/alias target) и запуск пока не подтверждены**. Полная таблица и безопасная команда для следующей проверки — [документ P-04A](MIPROJM05_ACTIVITY_DISCOVERY.md). Первой реализацией должны быть, при подтверждённом доступе, переходы в штатные Activity; не собственные команды мотора или калибровки.
 
-## Фото штатного меню от владельца (24.10.2026)
+## Точные зарегистрированные команды штатной оптики (24.10.2026)
+
+Дополнительная read-only проверка системного `dumpsys package` на прошивке `.4185` дала action-фильтры `com.fengmi.projector.imaging.action.START_FOCUS`, `START_KEYSTONE`, `START_AUTO_KEYSTONE`, `GUIDE_START`, все с категорией `DEFAULT`, и `MAIN` для `ImagingFeatureActivity`. Это **наблюдаемые записи PackageManager**, а не успешно выполненные команды на проекторе. Подробная таблица и способ локально проверить `android:exported` / `targetActivity` / `permission` — [карта Activity](MIPROJM05_ACTIVITY_DISCOVERY.md). Не запускать setupwizard-интенты, не пробовать неизвестные моторные команды и не включать HOME.
+
+
 
 На четырёх фотографиях экрана реального проектора показан путь **Настройки → Проектор**, где доступны пункты **Фокусировка** и **Коррекция трапецеидальных искажений**. На странице коррекции различимы **Коррекция трапецеидальных искажений**, **Автоматическая коррекция трапецеидальных искажений** (переключатель) и **Автоматическая калибровка трапецеидальных искажений**. На соседней странице **Изображение** видны режим изображения и пункт управления яркостью камеры.
 
