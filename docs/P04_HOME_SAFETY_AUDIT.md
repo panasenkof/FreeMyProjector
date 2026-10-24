@@ -74,6 +74,10 @@ com.droidlogic.overlay
 
 Следующий read-only запрос `dumpsys package` показал в `Activity Resolver Table` штатные записи `.alias.FocusActivity`, `.alias.KeystoneActivity`, `.alias.AutoKeystoneActivity`, `.alias.GuideActivity`, `.access.ImagingFeatureActivity` пакета `com.fengmi.projector.imaging`; `.ui.activity.MainActivity` в `com.formovie.gsettings`; `TvSettingsActivity`, `HdmiExtendSetupActivity` и другие у `com.droidlogic.tvinput`. Списки и ограничения подробно приведены в [P-04A activity discovery](MIPROJM05_ACTIVITY_DISCOVERY.md). **Степень экспортируемости, права и возможность запуска из обычного приложения ещё не установлены; команды запуска на устройстве не выполнялись**. `TV_INPUT_HARDWARE: granted=true` относится к OEM-пакетам, а не к нашему лаунчеру.
 
+### Уточнение Intent-фильтров (24.10.2026)
+
+Read-only вывод по `com.fengmi.projector.imaging` подтвердил точные actions: `START_FOCUS`, `START_KEYSTONE`, `START_AUTO_KEYSTONE`, `GUIDE_START`, а также `android.intent.action.MAIN` для `ImagingFeatureActivity` (под префиксом `com.fengmi.projector.imaging.action.`). Найдены и установочные интенты `com.android.setupwizard.action.HOOK_BEGIN`, `PRE_CORE_SETUP` — их запуск **не требуется и запрещён** для P-04A. См. [таблицу зарегистрированных Actions](MIPROJM05_ACTIVITY_DISCOVERY.md). Доступность для стороннего приложения и безопасный запуск на железе остаются неподтверждёнными.
+
 ## Что выполнить на Windows — ТОЛЬКО ЧТЕНИЕ
 Требуется уже установленное и разрешённое ADB-соединение; если оно больше не установлено, см. `docs/DEVICE_DIAGNOSTICS_WINDOWS.md`. PowerShell из любого каталога:
 
