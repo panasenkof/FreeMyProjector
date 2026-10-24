@@ -70,6 +70,10 @@ com.droidlogic.overlay
 
 Наличие `com.google.android.tvlauncher` как HOME **не означает**, что в нём реализованы фокус и коррекция трапеции. Эти функции могут использовать отдельные сервисы OEM и оборудование.
 
+## Новые факты по Activity — 24.10.2026
+
+Следующий read-only запрос `dumpsys package` показал в `Activity Resolver Table` штатные записи `.alias.FocusActivity`, `.alias.KeystoneActivity`, `.alias.AutoKeystoneActivity`, `.alias.GuideActivity`, `.access.ImagingFeatureActivity` пакета `com.fengmi.projector.imaging`; `.ui.activity.MainActivity` в `com.formovie.gsettings`; `TvSettingsActivity`, `HdmiExtendSetupActivity` и другие у `com.droidlogic.tvinput`. Списки и ограничения подробно приведены в [P-04A activity discovery](MIPROJM05_ACTIVITY_DISCOVERY.md). **Степень экспортируемости, права и возможность запуска из обычного приложения ещё не установлены; команды запуска на устройстве не выполнялись**. `TV_INPUT_HARDWARE: granted=true` относится к OEM-пакетам, а не к нашему лаунчеру.
+
 ## Что выполнить на Windows — ТОЛЬКО ЧТЕНИЕ
 Требуется уже установленное и разрешённое ADB-соединение; если оно больше не установлено, см. `docs/DEVICE_DIAGNOSTICS_WINDOWS.md`. PowerShell из любого каталога:
 

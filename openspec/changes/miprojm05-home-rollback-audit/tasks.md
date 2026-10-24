@@ -10,7 +10,8 @@
 - [x] Add fail-closed protections for observed packages and Formovie/Fengmi namespace prefixes; guard both disable loops and add static regression checks.
 - [x] Second filtered read-only inventory confirms 18 Fengmi/Formovie/Droidlogic/Camera2 packages on firmware `.4185` (24.10.2026).
 - [x] Extend fail-closed guard for `com.droidlogic` namespace and `com.android.camera2`, verify both disabling paths through CI static checks.
-- [ ] Verify `com.droidlogic.tvinput` actually powers HDMI and locate safe optical-settings Activity entries (read-only first).
+- [x] Find optical and TV settings Activity Resolver Table entries for imaging/gsettings/tvinput on real `.4185`, without starting them.
+- [ ] Check exported flags, alias targets, permissions and safe entry routes without mutation; HDMI/optical functional behavior remains untested.
 
 - [ ] Confirm access to focus and vertical keystone in native Xiaomi menu without changes.
 - [ ] Map actual optical dependency components and test that ordinary app opening keeps them accessible.

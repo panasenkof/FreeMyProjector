@@ -13,6 +13,21 @@ The system SHALL preserve access to the factory focus and vertical keystone func
 - **WHEN** switching HOME is proposed
 - **THEN** identify factory optical component dependencies, preserve them, provide tested rollback, and demonstrate optical functions first without changing HOME.
 
+### Requirement: Confirm factory Activity entry points before UI integration
+The project SHALL distinguish OEM component names found in a read-only resolver table from exported, callable and functionally verified Activity entry points. Unknown access MUST NOT trigger privilege bypasses or unreviewed calibration commands.
+
+#### Scenario: Read-only resolver discovery on MiProjM05
+- **WHEN** the device owner supplies filtered `dumpsys package` output listing imaging aliases FocusActivity, KeystoneActivity, AutoKeystoneActivity, GuideActivity and ImagingFeatureActivity
+- **THEN** document those exact class candidates and their read-only provenance while marking `exported`, required permissions and actual opening as unverified.
+
+#### Scenario: External launching still unverified
+- **WHEN** Activity export flags, permission requirements, target aliases or real-device behavior are unknown
+- **THEN** do not enable user-visible launcher shortcuts to those components and do not invoke them automatically.
+
+#### Scenario: HDMI settings versus input switching
+- **WHEN** `com.droidlogic.tvinput/.settings.HdmiExtendSetupActivity` is found in the resolver
+- **THEN** treat it as a candidate for HDMI settings only, not as confirmed HDMI input switching.
+
 ### Requirement: Port safe ADB authorization fix for Android 9
 The Android ADB client SHALL support bounded signed-only reconnection during first authorization on Android 8–10 without issuing system-modification commands.
 
