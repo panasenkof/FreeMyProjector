@@ -24,7 +24,11 @@
 
 ## Найденные Activity оптики и HDMI на реальной прошивке (24.10.2026)
 
-Вывод `dumpsys package` подтвердил записи резолвера `com.fengmi.projector.imaging/.alias.FocusActivity`, `.alias.KeystoneActivity`, `.alias.AutoKeystoneActivity`, `.alias.GuideActivity`, `.access.ImagingFeatureActivity`. Найден также `com.formovie.gsettings/.ui.activity.MainActivity` и несколько экранов `com.droidlogic.tvinput` (`TvSettingsActivity`, `HdmiExtendSetupActivity` и другие). **Точные классы найдены; публичный доступ (`exported`, права/alias target) и запуск пока не подтверждены**. Полная таблица и безопасная команда для следующей проверки — [документ P-04A](MIPROJM05_ACTIVITY_DISCOVERY.md). Первой реализацией должны быть, при подтверждённом доступе, переходы в штатные Activity; не собственные команды мотора или калибровки.
+Вывод `dumpsys package` подтвердил записи резолвера `com.fengmi.projector.imaging/.alias.FocusActivity`, `.alias.KeystoneActivity`, `.alias.AutoKeystoneActivity`, `.alias.GuideActivity`, `.access.ImagingFeatureActivity`. Найден также `com.formovie.gsettings/.ui.activity.MainActivity` и несколько экранов `com.droidlogic.tvinput` (`TvSettingsActivity`, `HdmiExtendSetupActivity` и другие). **Точные классы найдены; локальный AndroidManifest дополнительно подтверждает `targetActivity`, `enabled=true` и фильтры. Для алиасов с фильтрами отсутствие `exported` по умолчанию означает `true` на Android 9; но реальный запуск и совместимость с нашим APK пока не проверены**. Полная таблица и безопасная команда для следующей проверки — [документ P-04A](MIPROJM05_ACTIVITY_DISCOVERY.md). Первой реализацией должны быть, при подтверждённом доступе, переходы в штатные Activity; не собственные команды мотора или калибровки.
+
+## Сопутствующие обязательные функции и откат
+
+Перед сменой HOME нужно сохранить не только фокус/трапецию, но и **пульт с его сопряжением/повторным подключением**, **штатный экран «Изображение»** (режим изображения и пункт яркости камеры — точный смысл уточняем) и **локальную копию исходного состояния + проверенный сценарий восстановления**. В частности, не полагаться на сетевой ADB как единственный аварийный выход; отсутствие проверенного пути восстановления блокирует HOME-свитч. [Детальная спецификация P-04B](MIPROJM05_BACKUP_REMOTE_PICTURE_ROLLBACK.md).
 
 ## Фото штатного меню от владельца (24.10.2026)
 
@@ -45,7 +49,7 @@
 5. Проверить, какие именно приложения и сервисы нужны для обеих функций. Внести их в `HomeMode.PROTECTED` и дополнительный fail-closed сценарий P-04. Новые компоненты не угадывать по названию бренда.
 6. На первом этапе выводить из FreeMyProjector **штатные экраны Xiaomi**, а не писать собственный драйвер мотора. Перед первым запуском любых Intent на реальном проекторе согласовать сценарий и rollback.
 
-**Важно:** у проекта Free My TV появилась поддержка HY300 через `action.htcsettings.prjsettings`, но HY300 — другой проектор, это не команда для Xiaomi. В интернете встречается `com.fengmi.projector.imaging.action.START_FOCUS` для других устройств Xiaomi/Fengmi; для `MiProjM05` действие **не подтверждено** и автоматически вызывать его нельзя.
+**Важно:** у проекта Free My TV появилась поддержка HY300 через `action.htcsettings.prjsettings`, но HY300 — другой проектор, это не команда для Xiaomi. Действие `com.fengmi.projector.imaging.action.START_FOCUS` **уже подтверждено** фильтром `dumpsys` и локальным манифестом на MiProjM05; возможность безопасного запуска из обычного APK и поведение мотора ещё не проверены, поэтому не вызывать его автоматически.
 
 ## Если потребуется reverse engineering
 
