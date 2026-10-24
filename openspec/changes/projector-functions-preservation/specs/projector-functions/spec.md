@@ -20,6 +20,15 @@ The project SHALL distinguish OEM component names found in a read-only resolver 
 - **WHEN** the device owner supplies filtered `dumpsys package` output listing imaging aliases FocusActivity, KeystoneActivity, AutoKeystoneActivity, GuideActivity and ImagingFeatureActivity
 - **THEN** document those exact class candidates and their read-only provenance while marking `exported`, required permissions and actual opening as unverified.
 
+#### Scenario: Verified action filters from actual MiProjM05 firmware
+- **WHEN** the owner supplies the second read-only `dumpsys package com.fengmi.projector.imaging` context
+- **THEN** record the exact OEM action filters `com.fengmi.projector.imaging.action.START_FOCUS`, `com.fengmi.projector.imaging.action.START_KEYSTONE`, `com.fengmi.projector.imaging.action.START_AUTO_KEYSTONE`, `com.fengmi.projector.imaging.action.GUIDE_START` and `android.intent.action.MAIN` for `ImagingFeatureActivity`, all with observed DEFAULT category, as **resolver evidence only**
+- **AND** do not treat `START_AUTO_KEYSTONE` as proof of a separate calibration action
+
+#### Scenario: Setup wizard entry points also found
+- **WHEN** resolver includes `com.android.setupwizard.action.PRE_CORE_SETUP` or `com.android.setupwizard.action.HOOK_BEGIN`
+- **THEN** exclude these setup commands from launch shortcuts or automated tests; these are not ordinary user optical controls
+
 #### Scenario: External launching still unverified
 - **WHEN** Activity export flags, permission requirements, target aliases or real-device behavior are unknown
 - **THEN** do not enable user-visible launcher shortcuts to those components and do not invoke them automatically.
