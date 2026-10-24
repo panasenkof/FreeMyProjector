@@ -4,7 +4,7 @@
 
 ## Непосредственно найденные Activity Resolver Table
 
-Все ниже перечисленное — записи `Activity Resolver Table`, то есть кандидаты на точки входа. **Не установлены:** флаг `android:exported`, разрешения вызывающего приложения, разрешения Activity и alias-target, точные фильтры Action для всех строк, поведение при запуске из чужого UID. Отсутствие в отфильтрованном выводе НЕ доказывает отсутствие других Activity.
+Все ниже перечисленное — записи `Activity Resolver Table`, то есть кандидаты на точки входа. **Не установлены:** флаг `android:exported`, разрешения вызывающего приложения, разрешения Activity и alias-target, поведение при запуске из чужого UID. **Точные Action и категория DEFAULT для всех пяти imaging-входов подтверждены** дополнительным выводом от владельца (см. ниже); для Droidlogic фильтры пока не установлены. Отсутствие в отфильтрованном выводе НЕ доказывает отсутствие других Activity.
 
 | Пакет | Запись Activity в `dumpsys` | Вероятное назначение (не проверено запуском) |
 |---|---|---|
@@ -19,6 +19,22 @@
 | тот же | `com.droidlogic.tvinput/.settings.ChannelSearchActivity` | Поиск каналов, возможно неактуально для проектора |
 | тот же | `com.droidlogic.tvinput/.settings.HdmiExtendSetupActivity` | Настройки HDMI; **не является доказательством переключения HDMI источника** |
 
+## Второй read-only вывод: точные Intent Action — 24.10.2026
+
+Команда `dumpsys package com.fengmi.projector.imaging | Select-String ... -Context 7,10` показала **зарегистрированные** обработчики с `android.intent.category.DEFAULT`:
+
+| Action в штатном APK | Activity или activity-alias |
+|---|---|
+| `com.fengmi.projector.imaging.action.START_FOCUS` | `com.fengmi.projector.imaging/.alias.FocusActivity` |
+| `com.fengmi.projector.imaging.action.START_KEYSTONE` | `com.fengmi.projector.imaging/.alias.KeystoneActivity` |
+| `com.fengmi.projector.imaging.action.START_AUTO_KEYSTONE` | `com.fengmi.projector.imaging/.alias.AutoKeystoneActivity` |
+| `com.fengmi.projector.imaging.action.GUIDE_START` | `com.fengmi.projector.imaging/.alias.GuideActivity` |
+| `android.intent.action.MAIN` | `com.fengmi.projector.imaging/.access.ImagingFeatureActivity` |
+
+Также найден **отдельный** `com.android.setupwizard.action.HOOK_BEGIN` / `PRE_CORE_SETUP` в `com.fengmi.projector.imaging/.setupwizard.ForMoiveSetupwizard`. **Не запускать**: это установочный мастер устройства, он не нужен для обычной фокусировки и может затронуть первичную настройку.
+
+Наличие action-фильтра и записи resolver **не доказывает**, что запуск разрешён из пакета FreeMyProjector (`com.fader.freemyprojector`). Для каждого `activity-alias` Android манифест может независимо задавать `android:exported`, `android:permission` и `android:targetActivity`. Не считать, что `START_AUTO_KEYSTONE` обязательно означает автоматическую **калибровку** — это может быть другое действие.
+
 Для `com.fengmi.fmsettings` применённый пользователем фильтр не показал раздела `Activity Resolver Table`; это **не подтверждение отсутствия собственных неэкспортируемых экранов и сервисов**.
 
 `android.permission.TV_INPUT_HARDWARE: granted=true` встречается в `dumpsys` пакетов imaging/fmsettings/tvinput. Это сообщение о *разрешениях штатного приложения*, а не о праве FreeMyProjector получать тот же доступ, менять оптические параметры или общаться с TV hardware API.
@@ -30,7 +46,35 @@
 3. Возврат назад, D-pad и пульт, поведение сна/перезапуска и сохранение заводской настройки оптики проверять на самом устройстве. Если компонент недоступен из чужого UID, кнопка в оболочке должна быть скрыта/неактивна с безопасным переходом в общие настройки, но не пытаться обходить ограничения.
 4. `com.google.android.tvlauncher` продолжает быть заводским HOME. Никаких изменяющих ADB-команд, `pm disable*` или запуска неподтверждённых Activity до отдельной инструкции и разрешения.
 
-## Следующий **только читающий** шаг
+## Следующий шаг: исследовать AndroidManifest.xml без запуска оптики
+
+**Прямые Intent Action уже получены.** Повторять поиск resolver не нужно. Следующая задача — определить `exported`, `permission` и `targetActivity` для OEM activity-alias через **локальный анализ** манифеста. Это не запускает ни одну Activity и не меняет состояние Android.
+
+На Windows PowerShell с уже заданной переменной `$adb` и установленным Android SDK Build Tools (`aapt2.exe`):
+
+```powershell
+# 1. Узнать путь APK. Команда только читает сведения PackageManager.
+& $adb shell pm path com.fengmi.projector.imaging
+
+# 2. Найти aapt2.exe локально (если SDK установлен в типовом каталоге).
+Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Filter aapt2.exe -Recurse -ErrorAction SilentlyContinue |
+  Select-Object -ExpandProperty FullName
+
+# 3. При наличии доступного base.apk: скопировать OEM APK на локальный компьютер,
+# НЕ публиковать его; не исполнять и не декомпилировать лишние компоненты.
+# Пример: замените <ПУТЬ_ИЗ_pm_path> на точный путь после 'package:'.
+# & $adb pull '<ПУТЬ_ИЗ_pm_path>' "$env:TEMP\miprojm05-imaging-base.apk"
+
+# 4. После копирования посмотреть только атрибуты Activity в манифесте:
+# & '<ПУТЬ_К_aapt2.exe>' dump xmltree "$env:TEMP\miprojm05-imaging-base.apk" --file AndroidManifest.xml |
+#   Select-String -Pattern '(activity-alias|FocusActivity|KeystoneActivity|AutoKeystoneActivity|GuideActivity|ImagingFeatureActivity|android:exported|android:permission|android:targetActivity)' -Context 2,4
+```
+
+Для проверки `exported` следует изучить **полные блоки соответствующих `activity-alias` и связанной Activity** в дереве, а не произвольные совпадения по всему файлу. Факт наличия `intent-filter` при отсутствии явного `exported` нужно оценивать с учётом версии Android и приложения. Руководства: https://developer.android.com/guide/topics/manifest/activity-alias-element и https://developer.android.com/tools/aapt2 .
+
+Локальный APK не прикреплять к GitHub, не копировать в каталог проекта, не присылать приватные данные. При необходимости можно прислать **только** очищенные блоки `activity-alias` из манифеста.
+
+### Предыдущая необязательная команда контекста
 
 На Windows/PowerShell с уже настроенным `$adb`:
 
