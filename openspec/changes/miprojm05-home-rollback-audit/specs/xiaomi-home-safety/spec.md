@@ -31,6 +31,22 @@ The project SHALL provide a minimal, non-mutating procedure for owners to collec
 - **WHEN** the owner follows the P-04 collection procedure
 - **THEN** only package enumeration queries are run, no install, launcher switch, setting write, service start, reboot or package state change
 
+### Requirement: Safeguard observed Xiaomi OEM components
+
+The application MUST skip package-disabling operations for observed Fengmi and Xiaomi projector packages and MUST also conservatively protect unknown Formovie/Fengmi namespaces.
+
+#### Scenario: Installed OEM inventory
+- **WHEN** the owner provides the filtered real-device package inventory for MiProjM05 on 24.10.2026
+- **THEN** protect `com.fengmi.projector.imaging`, `com.fengmi.fmsettings`, `com.fengmi.platform`, autofocus/test and model-specific `com.fengmi.*` packages, and preserve the installed original `com.google.android.tvlauncher`
+
+#### Scenario: Unknown future Fengmi service
+- **WHEN** an installed package to be disabled starts with `com.fengmi.`, `com.formovie.`, or `cn.formovie.`
+- **THEN** skip disabling it regardless of presence in any optional debloat list
+
+#### Scenario: Initial disabled-package audit
+- **WHEN** the owner runs the filtered disabled list `pm list packages -d`
+- **THEN** record no matched disabled candidates, without claiming all packages system-wide are enabled
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 
