@@ -172,7 +172,7 @@ try {
     $verified = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
     $stage = 'verify-integrity'
     if ($verified.home.resolved -cne $homeCandidates[0] -or
-        $verified.package_states.PSObject.Properties.Count -ne $all.Count -or
+        @($verified.package_states.PSObject.Properties).Count -ne $all.Count -or
         (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) {
         Fail 'Cannot verify written snapshot'
     }
