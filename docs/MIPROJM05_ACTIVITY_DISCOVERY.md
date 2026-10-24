@@ -1,0 +1,61 @@
+# P-04A — найденные штатные Activity оптики и HDMI на MiProjM05/eva
+
+**Источник:** вывод `adb shell dumpsys package <package>` от владельца устройства, 24.10.2026; Android 9 / API 28, сборка `PQ3B.190705.003.4185`. **Метод:** только чтение. Никаких `am start`, установки, переключения HOME и изменения калибровок не выполнялось.
+
+## Непосредственно найденные Activity Resolver Table
+
+Все ниже перечисленное — записи `Activity Resolver Table`, то есть кандидаты на точки входа. **Не установлены:** флаг `android:exported`, разрешения вызывающего приложения, разрешения Activity и alias-target, точные фильтры Action для всех строк, поведение при запуске из чужого UID. Отсутствие в отфильтрованном выводе НЕ доказывает отсутствие других Activity.
+
+| Пакет | Запись Activity в `dumpsys` | Вероятное назначение (не проверено запуском) |
+|---|---|---|
+| `com.fengmi.projector.imaging` | `com.fengmi.projector.imaging/.alias.FocusActivity` | Штатный интерфейс фокусировки |
+| тот же | `com.fengmi.projector.imaging/.alias.KeystoneActivity` | Штатная коррекция трапеции |
+| тот же | `com.fengmi.projector.imaging/.alias.AutoKeystoneActivity` | Автоматическая коррекция; **не отождествлять с автоматической калибровкой без проверки** |
+| тот же | `com.fengmi.projector.imaging/.alias.GuideActivity` | Экран руководства/мастера |
+| тот же | `com.fengmi.projector.imaging/.access.ImagingFeatureActivity` | Вход в общие функции изображения (MAIN/DEFAULT) |
+| `com.formovie.gsettings` | `com.formovie.gsettings/.ui.activity.MainActivity` | Экран фирменных настроек (MAIN/LAUNCHER) |
+| `com.droidlogic.tvinput` | `com.droidlogic.tvinput/.settings.TvSettingsActivity` | Настройки входов ТВ |
+| тот же | `com.droidlogic.tvinput/.shortcut.ShortCutActivity` | Служебный быстрый вход; назначение неясно |
+| тот же | `com.droidlogic.tvinput/.settings.ChannelSearchActivity` | Поиск каналов, возможно неактуально для проектора |
+| тот же | `com.droidlogic.tvinput/.settings.HdmiExtendSetupActivity` | Настройки HDMI; **не является доказательством переключения HDMI источника** |
+
+Для `com.fengmi.fmsettings` применённый пользователем фильтр не показал раздела `Activity Resolver Table`; это **не подтверждение отсутствия собственных неэкспортируемых экранов и сервисов**.
+
+`android.permission.TV_INPUT_HARDWARE: granted=true` встречается в `dumpsys` пакетов imaging/fmsettings/tvinput. Это сообщение о *разрешениях штатного приложения*, а не о праве FreeMyProjector получать тот же доступ, менять оптические параметры или общаться с TV hardware API.
+
+## Значение для архитектуры
+
+1. Основной путь P-06: после проверки экспортируемости и доступа из обычного APK добавлять **ярлыки на заводские экраны** фокусировки/трапеции, не писать новый оптический драйвер и не менять их действия. Запуск через `Intent` / `ComponentName` должен быть отдельным шагом спецификации и проходить проверку наличия пакета и разрешений.
+2. Системный HDMI `com.droidlogic.tvinput` уже защищён P-04; `HdmiExtendSetupActivity` — лишь предполагаемый **экран настроек**, а не доказанная команда смены входа. Список входов изучить через `TvInputManager` отдельно.
+3. Возврат назад, D-pad и пульт, поведение сна/перезапуска и сохранение заводской настройки оптики проверять на самом устройстве. Если компонент недоступен из чужого UID, кнопка в оболочке должна быть скрыта/неактивна с безопасным переходом в общие настройки, но не пытаться обходить ограничения.
+4. `com.google.android.tvlauncher` продолжает быть заводским HOME. Никаких изменяющих ADB-команд, `pm disable*` или запуска неподтверждённых Activity до отдельной инструкции и разрешения.
+
+## Следующий **только читающий** шаг
+
+На Windows/PowerShell с уже настроенным `$adb`:
+
+```powershell
+# Показать только окружение найденных записей, без полного dumpsys.
+$targets = @(
+  @{ Package = 'com.fengmi.projector.imaging'; Regex = '(?i)(\.alias\.(FocusActivity|KeystoneActivity|AutoKeystoneActivity|GuideActivity)|\.access\.ImagingFeatureActivity)' },
+  @{ Package = 'com.formovie.gsettings'; Regex = '(?i)\.ui\.activity\.MainActivity' },
+  @{ Package = 'com.droidlogic.tvinput'; Regex = '(?i)(\.settings\.(TvSettingsActivity|HdmiExtendSetupActivity)|\.shortcut\.ShortCutActivity)' }
+)
+foreach ($t in $targets) {
+  "=== $($t.Package) ==="
+  & $adb shell dumpsys package $t.Package |
+    Select-String -Pattern $t.Regex -Context 6,8 |
+    Select-Object -First 10
+}
+```
+
+Этот вывод позволит увидеть соседние Action/Category и, возможно, часть описания компонентов. **Даже если он не показывает `exported` — нельзя автоматически считать активити общедоступными.** Для достоверного ответа о `exported`, `permission` и `targetActivity` потребуется локально прочитать **AndroidManifest.xml заводского APK** (через `pm path`, при допустимости `adb pull`, и Android build-tools `aapt2`/apkanalyzer). APK оставлять только локально, не загружать в открытый GitHub и не пытаться декомпилировать защищённые компоненты DRM.
+
+## Что остаётся НЕ проверенным
+
+- Реальный ручной/автоматический фокус и калибровка от нашего приложения (заводские меню сфотографированы, запуск из чужого APK — нет).
+- Экспортируемость и доступность этих Activity без привилегий; AndroidManifest пока не получен.
+- Реальная работа HDMI и пульта после любого изменения HOME.
+- Безопасный откат HOME на Android 9. `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED = false` должен оставаться закрытым.
+
+См. [P-04 аудит](P04_HOME_SAFETY_AUDIT.md), [оптика](PROJECTOR_FUNCTIONS.md) и [CleanYourTV для MiProjM05](CLEANYOURTV_MIPROJM05_RESEARCH.md).
