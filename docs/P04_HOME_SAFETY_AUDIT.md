@@ -28,6 +28,35 @@ com.fengmi.testsuite
 
 Вторая команда `pm list packages -d` с тем же фильтром совпадений **не дала**. Это значит только отсутствие *совпавших с фильтром* отключённых пакетов, но не доказывает, что вообще все приложения включены. Функции отдельных компонентов **не проверены запуском и не определены инструментально**.
 
+### Вторая инвентаризация OEM — расширенный фильтр (24 октября 2026)
+
+После изучения [CleanYourTV MiProjM05](CLEANYOURTV_MIPROJM05_RESEARCH.md) владелец повторил **только чтение** с фильтром `droidlogic|formovie|fengmi|tvinput|camera2` и подтвердил следующие **18 установленных пакетов**:
+
+```text
+com.droidlogic.tvinput
+com.fengmi.projector135MGN
+com.fengmi.autofocustest
+com.droidlogic
+com.formovie.gsettings
+com.android.camera2
+com.formovie.launchboard
+com.fengmi.platform
+com.fengmi.projector045G
+com.fengmi.projector055G
+cn.formovie.fengos.usermanual
+com.droidlogic.SubTitleService
+com.droidlogic.ble
+com.formovie.fmutils
+com.fengmi.fmsettings
+com.fengmi.projector.imaging
+com.fengmi.testsuite
+com.droidlogic.overlay
+```
+
+Наличие пакетов совпадает с несколькими рекомендациями внешнего профиля для другой сборки `.2102`. Это **подтверждение установки на нашей `.4185`**, не доказательство назначения компонентов, наличия внешних Activity или работоспособности интерфейсов после HOME-switch. **Этот новый результат не включает повторную команду `pm list packages -d`; предыдущие выводы об отключённых совпадениях остаются ограничены прежним фильтром.**
+
+Из-за неопределённости добавлены точные обнаруженные пакеты `com.droidlogic*` и `com.android.camera2` в консервативный блокирующий список; весь префикс `com.droidlogic.` и корень `com.droidlogic` считаются защищёнными. Остальные Formovie/Fengmi уже имели защиту префиксов. Эта защита — дополнительная страховка, а не разрешение менять HOME.
+
 ### Внешний сопоставимый экземпляр
 
 Для другого `MiProjM05/eva`, Android TV 9, build `PQ3B.190705.003.2102` публично описана защита `com.fengmi.projector.imaging` (focus/keystone), `com.fengmi.fmsettings`, `com.fengmi.platform` и других Formovie/HDMI компонентов. **У нас прошивка заканчивается на `.4185`, не `.2102`**; чужие списки отключений и команды не переносить и не запускать. Источник: https://github.com/Gathin23/cleanyourtv/blob/main/examples/formovie-mprojm05/debloat.txt
