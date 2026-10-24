@@ -65,6 +65,25 @@ def verify() -> tuple[str, int]:
     assert "FMP_BUILD_UNSIGNED" in build, "Unsigned PR CI mode removed"
     assert "--custom-package io.freemytv" in build, "Java R namespace does not match sources"
     assert "if (!ModeJob.PROJECTOR_HOME_SWITCH_AUDITED)" in homemode, "User-facing HOME request guard missing"
+    # MiProjM05 protections must remain effective even when future HOME work starts.
+    guard = homemode.split("private static boolean isProtectedPackage(String pkg)", 1)
+    assert len(guard) == 2, "Missing OEM package protection helper"
+    for prefix in ('com.fengmi.', 'com.formovie.', 'cn.formovie.'):
+        assert f'pkg.startsWith("{prefix}")' in guard[1], f"Missing OEM prefix protection: {prefix}"
+    assert homemode.count("if (isProtectedPackage(pkg) ||") == 2, "Disabling path bypasses OEM guard"
+    protected = homemode.split("private static final Set<String> PROTECTED =", 1)
+    assert len(protected) == 2, "Missing protected package list"
+    protected = protected[1].split("));", 1)[0]
+    mi_proj_keep = (
+        "com.fengmi.projector.imaging", "com.fengmi.fmsettings", "com.fengmi.platform",
+        "com.fengmi.autofocustest", "com.fengmi.projector135MGN",
+        "com.fengmi.projector045G", "com.fengmi.projector055G", "com.fengmi.testsuite",
+        "com.google.android.tvlauncher", "com.google.android.leanbacklauncher",
+        "com.google.android.tvrecommendations", "com.google.android.leanbacklauncher.recommendations",
+        "android.autoinstalls.config.xiaomi",
+    )
+    for pkg in mi_proj_keep:
+        assert f'"{pkg}"' in protected, f"MiProjM05 package must remain protected: {pkg}"
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
