@@ -23,3 +23,8 @@ __pycache__/
 *.key
 *keystore*.b64
 *.signing-secret
+
+# P-04B local HOME/package baselines: never commit per-device inventories
+MiProjM05-baseline-*/
+*baseline.private.json
+**/SHA256SUMS.txt
