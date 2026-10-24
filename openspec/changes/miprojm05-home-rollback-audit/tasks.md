@@ -11,6 +11,14 @@
 - [x] Second filtered read-only inventory confirms 18 Fengmi/Formovie/Droidlogic/Camera2 packages on firmware `.4185` (24.10.2026).
 - [x] Extend fail-closed guard for `com.droidlogic` namespace and `com.android.camera2`, verify both disabling paths through CI static checks.
 - [x] Find optical and TV settings Activity Resolver Table entries for imaging/gsettings/tvinput on real `.4185`, without starting them.
+- [x] Receive local `FengmiImaging.apk` manifest excerpt: target `ImagingFeatureActivity` exported=true, alias enabled=true, each alias has Action/DEFAULT; Android 9 alias with intent-filter defaults exported=true (practical external launch not yet tested).
+- [x] Specify mandatory pre-change local backup, remote pairing/re-pairing, picture settings from photos, no-root backup limits, and fail-closed rollback matrix in [P-04B](../../../docs/MIPROJM05_BACKUP_REMOTE_PICTURE_ROLLBACK.md).
+- [ ] Design and implement a **read-only, privacy-safe local state-snapshot tool**; verify archives, SHA256 and missing-field refusal; DO NOT represent this as a full firmware backup.
+- [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
+- [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
+- [ ] Simulate Android 9 rollback of original HOME and per-package enabled/disabled states on mocks; verify failure paths and absence of dangerous fallback.
+- [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
+
 - [ ] Check exported flags, alias targets, permissions and safe entry routes without mutation; HDMI/optical functional behavior remains untested.
 
 - [ ] Confirm access to focus and vertical keystone in native Xiaomi menu without changes.

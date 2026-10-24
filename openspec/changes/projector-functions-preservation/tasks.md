@@ -7,7 +7,9 @@
 - [ ] Confirm CI compilation and existing regression tests on the PR.
 - [x] Review [CleanYourTV MiProjM05 profile](https://github.com/Gathin23/cleanyourtv/tree/main/examples/formovie-mprojm05), with research in [docs/CLEANYOURTV_MIPROJM05_RESEARCH.md](../../../docs/CLEANYOURTV_MIPROJM05_RESEARCH.md) (different firmware, research only).
 - [x] Map imaging FocusActivity/KeystoneActivity/AutoKeystoneActivity and Droidlogic settings Activity names from owner-supplied `dumpsys package`, documented in [docs/MIPROJM05_ACTIVITY_DISCOVERY.md](../../../docs/MIPROJM05_ACTIVITY_DISCOVERY.md) (read-only names, not proven callable).
-- [ ] Verify imaging Activity-alias `exported` / `targetActivity` / permissions and Intent filters with read-only manifest examination before proposing direct launch.
+- [x] Read actual OEM `FengmiImaging.apk` AndroidManifest locally: target `ImagingFeatureActivity` exported=true, aliases enabled=true with `targetActivity`; Android 9 aliases with filters default exported=true.
+- [ ] Check remaining permission/runtime restrictions and a safe ordinary-APK launch separately; no automated keystone or motor test before consent.
+- [ ] Before HOME changes, satisfy P-04B: remote (including re-pairing), native picture controls, verified local backup and recovery plan ([protocol](../../../docs/MIPROJM05_BACKUP_REMOTE_PICTURE_ROLLBACK.md)).
 - [ ] Investigate actual Formovie settings, Droidlogic HDMI behavior and remote gear codes **read-only**; do not import debloat list.
 - [ ] On real MiProjM05, inventory required focus/keystone packages (read-only).
 - [ ] Verify stock focus/keystone from our app **without** switching HOME.
