@@ -117,12 +117,20 @@ final class HomeMode {
         "com.fengmi.projector045G", "com.fengmi.projector055G", "com.fengmi.testsuite",
         "com.google.android.tvlauncher", "com.google.android.leanbacklauncher",
         "com.google.android.tvrecommendations", "com.google.android.leanbacklauncher.recommendations",
-        "android.autoinstalls.config.xiaomi"));
+        "android.autoinstalls.config.xiaomi",
+        // MiProjM05/eva build .4185: independently observed through read-only package list.
+        // HDMI is linked to Droidlogic in CleanYourTV for .2102; preserve all OEM services
+        // on our firmware until exact dependencies and recovery are verified.
+        "com.droidlogic", "com.droidlogic.tvinput", "com.droidlogic.SubTitleService",
+        "com.droidlogic.ble", "com.droidlogic.overlay",
+        "com.formovie.gsettings", "com.formovie.fmutils", "com.formovie.launchboard",
+        "cn.formovie.fengos.usermanual", "com.android.camera2"));
 
-    /** Future-proof Xiaomi safety: do not disable unknown Fengmi/Formovie packages. */
+    /** Protect unverified OEM optical/HDMI/remote components on MiProjM05. */
     private static boolean isProtectedPackage(String pkg) {
         return pkg != null && (PROTECTED.contains(pkg) || pkg.startsWith("com.fengmi.")
-                || pkg.startsWith("com.formovie.") || pkg.startsWith("cn.formovie."));
+                || pkg.startsWith("com.formovie.") || pkg.startsWith("cn.formovie.")
+                || pkg.equals("com.droidlogic") || pkg.startsWith("com.droidlogic."));
     }
 
     /** One switch at a time (jobs can overlap: a boot check and a button press). */
