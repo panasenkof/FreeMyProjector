@@ -28,6 +28,22 @@ The project SHALL distinguish OEM component names found in a read-only resolver 
 - **WHEN** `com.droidlogic.tvinput/.settings.HdmiExtendSetupActivity` is found in the resolver
 - **THEN** treat it as a candidate for HDMI settings only, not as confirmed HDMI input switching.
 
+### Requirement: OEM optical/picture entry points are not a substitute for rollback
+
+An external launcher SHALL not invoke automatic calibration or change picture settings merely because an OEM manifest declares a callable alias. Future launcher entry points SHALL preserve the native picture-mode UI and remote input/pairing independently of the custom HOME.
+
+#### Scenario: OEM manifest read-only verification
+- **WHEN** a local `aapt2 dump xmltree` of `FengmiImaging.apk` confirms target `ImagingFeatureActivity` exported=true, and enabled focus/keystone/auto-keystone/guide aliases each have intent filters without an explicit exported attribute
+- **THEN** document their Android 9 default exported=true status as **manifest-level evidence** but not as proof of runtime accessibility or motor behavior.
+
+#### Scenario: Picture controls present in a photo
+- **WHEN** the OEM 'Изображение' menu shows picture mode and camera brightness
+- **THEN** require discovery and preservation of those settings through OEM UI instead of inventing numeric adjustments or assuming camera brightness equals projector lamp brightness.
+
+#### Scenario: Consent for calibration
+- **WHEN** an alias such as `START_AUTO_KEYSTONE` may initiate a hardware action
+- **THEN** do not auto-run it on installation or navigation; reserve actual tests for a separate consented and reversible device pilot.
+
 ### Requirement: Port safe ADB authorization fix for Android 9
 The Android ADB client SHALL support bounded signed-only reconnection during first authorization on Android 8–10 without issuing system-modification commands.
 
