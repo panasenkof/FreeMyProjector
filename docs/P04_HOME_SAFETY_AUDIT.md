@@ -75,6 +75,10 @@ $pattern = '(?i)(xiaomi|miui|mitv|fengmi|focus|keystone|projector|calib|optical|
 - `settings put`, изменения заставки и Wi-Fi, `am start` непроверенных служебных Activity/Intent;
 - root, bootloader, OTA/recovery/перепрошивка и копирование OEM APK в общедоступный репозиторий.
 
+## Дополнительный источник по точной модели
+
+Сохранена ссылка на [CleanYourTV](https://github.com/Gathin23/cleanyourtv/tree/main/examples/formovie-mprojm05) и [наш подробный анализ](CLEANYOURTV_MIPROJM05_RESEARCH.md). Вторая сборка MiProjM05/eva (`.2102`) подтверждает важность `com.droidlogic.tvinput`, сохранения настроек Formovie и осторожности с `FallbackHome`, пультом и состоянием после reboot. Для нашей `.4185` это **кандидаты на read-only проверку**, не подтверждённые зависимости и не список для выполнения. Концепция записи enabled/disabled/HOME *до изменения* полезна для будущего P-04 rollback; действия по HOME всё ещё запрещены.
+
 ## Что будет дальше
 Сверяем кандидатов с текущим `HomeMode.PROTECTED` и логикой `targets`, выясняем реальное назначение OEM компонентов, проектируем Android 9 rollback. Первый допустимый тест нового приложения — запуск **как обычного приложения без смены HOME** в отдельном согласованном P-05. Новый подписанный релиз после PR #7 понадобится отдельно: `v0.1.0` был собран до переноса upstream ADB-исправления.
 
