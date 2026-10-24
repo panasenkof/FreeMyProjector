@@ -19,7 +19,10 @@ function Test-Case([string]$Scenario,[bool]$ExpectedSuccess) {
         else { throw 'Expected failure but succeeded' }
     }
     catch { $errorText = $_.Exception.Message }
-    if ($ExpectedSuccess -and $errorText -ne '') { throw "Baseline unexpectedly failed in $Scenario : $errorText" }
+    if ($ExpectedSuccess -and $errorText -ne '') {
+        $commands = @(Get-Content -LiteralPath $env:FMP_MOCK_LOG -ErrorAction SilentlyContinue)
+        throw "Baseline unexpectedly failed in $Scenario : $errorText; last offline command: $($commands | Select-Object -Last 1)"
+    }
     Check (Test-Path -LiteralPath $env:FMP_MOCK_LOG) "ADB was never invoked in $Scenario : $errorText"
     $calls = @(Get-Content -LiteralPath $env:FMP_MOCK_LOG -ErrorAction SilentlyContinue | Where-Object { $_ -ne $null })
     Check ($calls.Count -gt 0) 'No ADB queries logged'
