@@ -5,6 +5,37 @@
 
 Это **не** тест установки FreeMyProjector, безопасности замены HOME или сохранности фокусировки после замены. IP, serial, MAC и имена Wi-Fi здесь не записаны.
 
+## Результат первой инвентаризации OEM (24 октября 2026)
+
+Пользователь выполнил `adb shell pm list packages` с локальным фильтром. **Найдены**:
+
+```text
+com.android.tv.settings
+com.fengmi.projector135MGN
+com.fengmi.autofocustest
+com.fengmi.platform
+com.fengmi.projector045G
+com.fengmi.projector055G
+com.google.android.tvrecommendations
+com.google.android.leanbacklauncher.recommendations
+com.google.android.tvlauncher
+com.fengmi.fmsettings
+android.autoinstalls.config.xiaomi
+com.fengmi.projector.imaging
+com.google.android.leanbacklauncher
+com.fengmi.testsuite
+```
+
+Вторая команда `pm list packages -d` с тем же фильтром совпадений **не дала**. Это значит только отсутствие *совпавших с фильтром* отключённых пакетов, но не доказывает, что вообще все приложения включены. Функции отдельных компонентов **не проверены запуском и не определены инструментально**.
+
+### Внешний сопоставимый экземпляр
+
+Для другого `MiProjM05/eva`, Android TV 9, build `PQ3B.190705.003.2102` публично описана защита `com.fengmi.projector.imaging` (focus/keystone), `com.fengmi.fmsettings`, `com.fengmi.platform` и других Formovie/HDMI компонентов. **У нас прошивка заканчивается на `.4185`, не `.2102`**; чужие списки отключений и команды не переносить и не запускать. Источник: https://github.com/Gathin23/cleanyourtv/blob/main/examples/formovie-mprojm05/debloat.txt
+
+### Защита в FreeMyProjector
+
+Добавлены точные обнаруженные кандидаты и штатный TV Launcher в `HomeMode.PROTECTED`. Предусмотрен общий запрет отключения любого `com.fengmi.*`, `com.formovie.*`, `cn.formovie.*`, включая ещё не обнаруженные. CI проверяет, что оба пути выключения используют этот guard. Это **дополнительная страховка**, а не доказательство, что будущая смена HOME безопасна: `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED = false` остаётся без изменения.
+
 ## Зачем дополнительная проверка
 Оригинальный Free My TV при переключении не только назначает HOME, но и выполняет `pm disable-user`, `settings put secure screensaver_components`, делает фоновые проверки, пытается вернуть HOME через команду `cmd role`. Набор команд и запасной путь восстановления могут быть неподходящими для Android 9 Xiaomi. Пока `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED=false`; блокировку не менять.
 
