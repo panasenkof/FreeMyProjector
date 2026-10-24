@@ -7,7 +7,9 @@
 - [ ] Confirm CI compilation and existing regression tests on the PR.
 - [x] Review [CleanYourTV MiProjM05 profile](https://github.com/Gathin23/cleanyourtv/tree/main/examples/formovie-mprojm05), with research in [docs/CLEANYOURTV_MIPROJM05_RESEARCH.md](../../../docs/CLEANYOURTV_MIPROJM05_RESEARCH.md) (different firmware, research only).
 - [x] Map imaging FocusActivity/KeystoneActivity/AutoKeystoneActivity and Droidlogic settings Activity names from owner-supplied `dumpsys package`, documented in [docs/MIPROJM05_ACTIVITY_DISCOVERY.md](../../../docs/MIPROJM05_ACTIVITY_DISCOVERY.md) (read-only names, not proven callable).
-- [ ] Verify imaging Activity-alias `exported` / `targetActivity` / permissions and Intent filters with read-only manifest examination before proposing direct launch.
+- [x] Identify exact action strings START_FOCUS / START_KEYSTONE / START_AUTO_KEYSTONE / GUIDE_START and MAIN, all via read-only resolver; distinguish setupwizard actions.
+- [ ] Verify imaging Activity-alias `exported` / `targetActivity` / permissions through **local manifest** examination before proposing direct launch; action filters now verified but external access is not.
+- [ ] After manifest inspection, write separate opt-in requirements/tests for ordinary-APK launch of OEM screens (never HOME switch or privileged calibration).
 - [ ] Investigate actual Formovie settings, Droidlogic HDMI behavior and remote gear codes **read-only**; do not import debloat list.
 - [ ] On real MiProjM05, inventory required focus/keystone packages (read-only).
 - [ ] Verify stock focus/keystone from our app **without** switching HOME.
