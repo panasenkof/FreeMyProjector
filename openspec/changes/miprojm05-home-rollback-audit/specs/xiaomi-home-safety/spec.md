@@ -56,6 +56,42 @@ The application MUST skip package-disabling operations for observed Fengmi and X
 - **WHEN** the owner runs the filtered disabled list `pm list packages -d`
 - **THEN** record no matched disabled candidates, without claiming all packages system-wide are enabled
 
+### Requirement: Pre-change snapshot and rollback are mandatory gates
+
+The project MUST NOT change default HOME or disable any system package until the owner has created a local read-only evidence snapshot of original HOME and package states, the recovery procedure has passed offline tests, the independent device recovery path has been verified, and separate approval is given for the specific test.
+
+#### Scenario: A backup is claimed but not produced
+- **WHEN** only a plan or a previously pulled single OEM APK exists, without a verified timestamped snapshot of HOME, installed/disabled packages and firmware build
+- **THEN** HOME mutation and package deactivation MUST remain locked, and it MUST NOT claim a full firmware backup.
+
+#### Scenario: Original package states
+- **WHEN** a rollback is prepared
+- **THEN** the original snapshot SHALL not be overwritten by subsequent runs and restoration SHALL preserve packages that were disabled before testing rather than enabling all packages.
+
+#### Scenario: Recovery if ADB or remote is unavailable
+- **WHEN** ADB or remote control access is lost during a proposed modification
+- **THEN** the procedure SHALL have a previously verified recovery route; if not, reject the HOME pilot rather than assume root, recovery image, or factory reset is safe.
+
+#### Scenario: Android 9 HOME fallback
+- **WHEN** validating recovery from a launcher change on API 28
+- **THEN** `FallbackHome` or factory test activities MUST NOT count as a working launcher, and reported `set-home-activity` success alone MUST NOT count as verified HOME restoration.
+
+### Requirement: Preserve remote pairing and actual picture settings
+
+The system SHALL preserve factory remote pairing/re-pairing, remote keys and original picture settings, including picture mode and the camera-brightness entry shown in the user's screenshot.
+
+#### Scenario: Remote pairing is not yet verified
+- **WHEN** Bluetooth/IR pairing mechanism or re-pairing and fallback input are unverified on MiProjM05
+- **THEN** no default HOME modification may be approved, even if the remote's D-pad works before the change.
+
+#### Scenario: Remote long press
+- **WHEN** testing the remote before and after changes
+- **THEN** Home, Back, D-pad/OK, Settings key, sleep/power, voice if available, and volume-button long press SHALL be part of the acceptance procedure, with actual re-pairing recovery evaluated.
+
+#### Scenario: Picture-screen preservation
+- **WHEN** testing a new launcher or native-settings entry point
+- **THEN** preserve access to OEM 'Изображение' and record original picture mode and all actually present picture controls without inventing firmware values; do not assume the camera-brightness setting is projector-lamp brightness.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 
