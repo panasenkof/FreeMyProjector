@@ -1,5 +1,7 @@
 # Projector functions preservation spec
 
+## ADDED Requirements
+
 ### Requirement: Keep stock Xiaomi optical functionality
 #### Scenario: Unknown factory service dependencies
 - **WHEN** stock focus/keystone package dependencies are unknown for MiProjM05
