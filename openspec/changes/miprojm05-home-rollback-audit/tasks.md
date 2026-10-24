@@ -5,8 +5,9 @@
 - [x] Write OpenSpec proposal, design and non-mutating safety specification.
 - [x] Document read-only Windows ADB package inventory for owner.
 - [x] Preserve the source-level HOME safety lock and require separate consent for any future mutation.
-- [ ] Confirm filtered installed system/OEM packages on real device.
-- [ ] Confirm preexisting disabled-package state (filtered).
+- [x] Confirm filtered OEM package candidates on real device 24.10.2026: Fengmi imaging/settings/platform/autofocus/tests plus Google HOME (documented without IP/serial).
+- [x] Confirm no matches in disabled-package list with the SAME filter (not a global disabled-state claim).
+- [x] Add fail-closed protections for observed packages and Formovie/Fengmi namespace prefixes; guard both disable loops and add static regression checks.
 - [ ] Confirm access to focus and vertical keystone in native Xiaomi menu without changes.
 - [ ] Map actual optical dependency components and test that ordinary app opening keeps them accessible.
 - [ ] Design and review an Android 9 specific reversible HOME method with ADB + remote rollback.
