@@ -32,7 +32,7 @@ function Read-Adb {
     }
     catch {
         # Never print raw stderr/stdout: it may include serials or IPs.
-        Fail 'ADB read failed'
+        Fail ('ADB read failed [' + $_.Exception.GetType().Name + ']')
     }
 }
 function Read-Property([string]$Key) {
