@@ -22,22 +22,18 @@ function Fail([string]$Why) { throw "P-04B baseline NOT saved: $Why. Projector s
 
 function Read-Adb {
     param([string[]]$Arguments, [switch]$AllowEmpty)
-    $stage = 'before-invoke'
     try {
-        if ($Arguments.Count -lt 1) { Fail 'Empty ADB argument list' }
+        if ($null -eq $Arguments -or $Arguments.Count -lt 1) { Fail 'Empty ADB argument list' }
         $global:LASTEXITCODE = 0
         $raw = & $script:AdbExecutable @Arguments 2>&1
-        $stage = 'after-invoke'
         if ($LASTEXITCODE -ne 0) { Fail 'ADB command failed' }
-        $stage = 'after-exit-check'
         $text = (@($raw) -join [Environment]::NewLine).Trim()
-        $stage = 'after-join'
         if (-not $AllowEmpty -and [string]::IsNullOrWhiteSpace($text)) { Fail 'ADB returned empty result' }
         return [string]$text
     }
     catch {
         # Never print raw stderr/stdout: it may include serials or IPs.
-        Fail ('ADB read failed [' + $stage + '/' + $_.Exception.GetType().Name + ']')
+        Fail 'ADB read failed'
     }
 }
 function Read-Property([string]$Key) {
@@ -118,8 +114,8 @@ if (-not $claimants.Contains('com.google.android.tvlauncher/.MainActivity')) {
 }
 
 $all = Read-Packages -Query @('shell','pm','list','packages')
-$disabled = Read-Packages -Args @('shell','pm','list','packages','-d') -AllowEmpty
-$enabled = Read-Packages -Args @('shell','pm','list','packages','-e')
+$disabled = Read-Packages -Query @('shell','pm','list','packages','-d') -AllowEmpty
+$enabled = Read-Packages -Query @('shell','pm','list','packages','-e')
 foreach ($name in $disabled) {
     if (-not $all.Contains($name) -or $enabled.Contains($name)) { Fail 'Inconsistent disabled packages' }
 }
