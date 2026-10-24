@@ -5,6 +5,8 @@
 - [x] Document optical function preservation, read-only discovery, firmware research and rollback acceptance.
 - [x] Preserve P-04 safety gate, signing and Android package identity.
 - [ ] Confirm CI compilation and existing regression tests on the PR.
+- [x] Review [CleanYourTV MiProjM05 profile](https://github.com/Gathin23/cleanyourtv/tree/main/examples/formovie-mprojm05), with research in [docs/CLEANYOURTV_MIPROJM05_RESEARCH.md](../../../docs/CLEANYOURTV_MIPROJM05_RESEARCH.md) (different firmware, research only).
+- [ ] Investigate Formovie settings packages, Droidlogic HDMI and remote gear codes on actual firmware **read-only**; do not import debloat list.
 - [ ] On real MiProjM05, inventory required focus/keystone packages (read-only).
 - [ ] Verify stock focus/keystone from our app **without** switching HOME.
 - [ ] Introduce protected OEM components from real evidence, run P-04 rollback acceptance.
