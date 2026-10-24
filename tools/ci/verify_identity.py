@@ -68,8 +68,9 @@ def verify() -> tuple[str, int]:
     # MiProjM05 protections must remain effective even when future HOME work starts.
     guard = homemode.split("private static boolean isProtectedPackage(String pkg)", 1)
     assert len(guard) == 2, "Missing OEM package protection helper"
-    for prefix in ('com.fengmi.', 'com.formovie.', 'cn.formovie.'):
+    for prefix in ('com.fengmi.', 'com.formovie.', 'cn.formovie.', 'com.droidlogic.'):
         assert f'pkg.startsWith("{prefix}")' in guard[1], f"Missing OEM prefix protection: {prefix}"
+    assert 'pkg.equals("com.droidlogic")' in guard[1], "Droidlogic root package must be protected"
     assert homemode.count("if (isProtectedPackage(pkg) ||") == 2, "Disabling path bypasses OEM guard"
     protected = homemode.split("private static final Set<String> PROTECTED =", 1)
     assert len(protected) == 2, "Missing protected package list"
@@ -81,6 +82,10 @@ def verify() -> tuple[str, int]:
         "com.google.android.tvlauncher", "com.google.android.leanbacklauncher",
         "com.google.android.tvrecommendations", "com.google.android.leanbacklauncher.recommendations",
         "android.autoinstalls.config.xiaomi",
+        "com.droidlogic", "com.droidlogic.tvinput", "com.droidlogic.SubTitleService",
+        "com.droidlogic.ble", "com.droidlogic.overlay",
+        "com.formovie.gsettings", "com.formovie.fmutils", "com.formovie.launchboard",
+        "cn.formovie.fengos.usermanual", "com.android.camera2",
     )
     for pkg in mi_proj_keep:
         assert f'"{pkg}"' in protected, f"MiProjM05 package must remain protected: {pkg}"
