@@ -43,6 +43,15 @@ The application MUST skip package-disabling operations for observed Fengmi and X
 - **WHEN** an installed package to be disabled starts with `com.fengmi.`, `com.formovie.`, or `cn.formovie.`
 - **THEN** skip disabling it regardless of presence in any optional debloat list
 
+#### Scenario: Second installed-package inventory and platform protections
+- **WHEN** the owner supplies the second read-only filtered list of 18 OEM packages from `PQ3B.190705.003.4185`
+- **THEN** all detected Droidlogic packages (`com.droidlogic` and descendants) and `com.android.camera2` SHALL be protected from both package-disabling paths, as already are `com.fengmi.*`, `com.formovie.*` and `cn.formovie.*`
+- **AND** retaining the package MUST NOT be treated as evidence that HDMI, focus, auto-keystone or camera services work after switching HOME
+
+#### Scenario: Future Droidlogic namespace package
+- **WHEN** a future disable target is `com.droidlogic` or starts with `com.droidlogic.`
+- **THEN** disabling it MUST be skipped regardless of whether it was present in the 24.10.2026 list
+
 #### Scenario: Initial disabled-package audit
 - **WHEN** the owner runs the filtered disabled list `pm list packages -d`
 - **THEN** record no matched disabled candidates, without claiming all packages system-wide are enabled
