@@ -2,6 +2,8 @@
 
 **Почему:** на Android приложение может быть включено для одного пользователя и отключено для другого. Для восстановления недостаточно знать только названия 114 пакетов. Android Open Source Project подтверждает, что `adb shell pm list packages --user 0` с `-e` и `-d` запрашивает конкретного пользователя. Ссылка: https://source.android.com/docs/devices/admin/multi-user-testing ; реальную поддержку на MiProjM05/.4185 ещё предстоит проверить.
 
+**Реальный результат P-04E от владельца 25.10.2026:** `user0-matches-baseline`, `active_android_user=0`, `implicit_packages=114`, `explicit_user0_packages=114`, `explicit_user0_disabled=0`, `snapshot_packages=114`, обе метрики расхождения = 0, `snapshot_sha256=match`, `device_writes=0`, `home_switch_blocked=true`. Это подтверждает соответствие per-user на текущей прошивке, но не является реальным rollback. [Оставшиеся критерии P-04F](P04F_ANDROID9_RECOVERY_GATES.md).
+
 **Уже проверено 25.10.2026:** настоящий baseline (114 пакетов, 0 отключённых) совпадает с HOME и состояниями проектора. P-04D офлайн-тест с этим снимком завершён `passed` во всех 5 сценариях. Это не доказывает реальный откат.
 
 ## На Windows после зелёного CI и слияния PR
