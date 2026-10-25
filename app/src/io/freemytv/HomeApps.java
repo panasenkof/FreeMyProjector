@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -370,7 +371,18 @@ final class HomeApps {
                 intent = liveTv(a);
                 break;
             case INPUT:
+                // MiProjM05: a TvInputInfo ID does not prove that there is a
+                // Live-TV Activity able to handle ACTION_VIEW for that HDMI port.
+                // Never broadcast the passthrough URI to an arbitrary handler.
+                if (it.inputId == null || it.inputId.isEmpty()) return openHdmiSettingsFallback(a);
                 intent = new Intent(Intent.ACTION_VIEW, TvContract.buildChannelUriForPassthroughInput(it.inputId));
+                if (isAuditedMiProjector()) {
+                    ResolveInfo handler = a.getPackageManager().resolveActivity(
+                            intent, PackageManager.MATCH_DEFAULT_ONLY);
+                    ActivityInfo info = handler == null ? null : handler.activityInfo;
+                    if (!trustedHdmiViewer(info)) return openHdmiSettingsFallback(a);
+                    intent.setClassName(info.packageName, info.name);
+                }
                 break;
             case SETTINGS:
                 intent = new Intent().setComponent(new ComponentName(a, SettingsActivity.class));
@@ -388,8 +400,33 @@ final class HomeApps {
             return true;
         } catch (ActivityNotFoundException | SecurityException e) {
             AppLog.w("couldn't open " + it.label + ": " + e.getMessage());
+            if (it.kind == INPUT && isAuditedMiProjector()) return openHdmiSettingsFallback(a);
             return false;
         }
+    }
+
+    private static boolean isAuditedMiProjector() {
+        return Build.VERSION.SDK_INT == 28
+                && "MiProjM05".equals(Build.MODEL)
+                && "eva".equals(Build.DEVICE)
+                && "PQ3B.190705.003.4185".equals(Build.DISPLAY);
+    }
+
+    private static boolean trustedHdmiViewer(ActivityInfo info) {
+        if (info == null || !info.exported || !info.enabled
+                || info.applicationInfo == null || !info.applicationInfo.enabled
+                || (info.permission != null && !info.permission.isEmpty())) return false;
+        int systemFlags = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
+        return (info.applicationInfo.flags & systemFlags) != 0
+                && ("com.droidlogic.tvinput".equals(info.packageName)
+                    || "com.android.tv".equals(info.packageName));
+    }
+
+    private static boolean openHdmiSettingsFallback(Activity a) {
+        // Only NAVIGATES to trusted factory/Android settings; does not change
+        // TV input, scan HDMI, or issue a key event. P-05 HOME stays disabled.
+        ProjectorSettingsNavigator.openFromUserTap(a, ProjectorSettingsNavigator.SOURCES, 0);
+        return true;
     }
 
     /**
