@@ -34,18 +34,18 @@ final class ProjectorSettingsNavigator {
     };
 
     private static final String[][] ITEMS_PT = {
-        {"Foco", "Correção trapezoidal", "Orientação da projeção"},
+        {"Foco", "Correção trapezoidal", "Correção trapezoidal automática", "Calibração trapezoidal", "Orientação da projeção"},
         {"Modo de imagem", "Brilho da câmera", "Ajustes de imagem"},
-        {"Entrada HDMI", "Armazenamento USB", "Google Cast"},
+        {"Entrada HDMI", "Armazenamento USB", "Google Cast", "Zoom HDMI"},
         {"Saída de áudio", "Modo alto-falante Bluetooth", "Fones de ouvido"},
         {"Rede Wi-Fi", "Controle e Bluetooth", "Google Cast", "Assistente de voz"},
         {"Suspensão e energia", "Sobre e atualizações", "Aplicativos instalados",
          "Idioma do sistema", "Acessibilidade", "Todas as configurações"}
     };
     private static final String[][] ITEMS_EN = {
-        {"Focus", "Keystone correction", "Projection orientation"},
+        {"Focus", "Keystone correction", "Automatic keystone", "Keystone calibration", "Projection orientation"},
         {"Picture mode", "Camera brightness", "Picture settings"},
-        {"HDMI input", "USB storage", "Google Cast"},
+        {"HDMI input", "USB storage", "Google Cast", "HDMI zoom"},
         {"Audio output", "Bluetooth speaker mode", "Headphones"},
         {"Wi-Fi network", "Remote & Bluetooth", "Google Cast", "Voice assistant"},
         {"Sleep & power", "About & updates", "Installed apps",
@@ -70,8 +70,8 @@ final class ProjectorSettingsNavigator {
 
     static String itemRoute(int section, int item) {
         // Direct routes are identified here; everything else safely returns to OEM settings.
-        if (section == OPTICS && item < 2) return Ui.tr("Tela de fábrica", "Factory screen");
-        if (section == SOURCES && item == 0) return Ui.tr("Tela de fábrica", "Factory screen");
+        if (section == OPTICS && item < 4) return Ui.tr("Tela de fábrica", "Factory screen");
+        if (section == SOURCES && (item == 0 || item == 3)) return Ui.tr("Tela de fábrica", "Factory screen");
         if (section == CONNECTIONS && item == 1) return Ui.tr("Tela de fábrica", "Factory screen");
         if ((section == SOURCES && item > 0)
                 || (section == SOUND && item != 1)
@@ -167,14 +167,14 @@ final class ProjectorSettingsNavigator {
         switch (section) {
             case OPTICS:
                 if (item == 0) openOptics(activity, ProjectorFactoryScreens.Screen.FOCUS);
-                else if (item == 1) openOptics(activity, ProjectorFactoryScreens.Screen.KEYSTONE);
+                else if (item >= 1 && item <= 3) openOptics(activity, ProjectorFactoryScreens.Screen.KEYSTONE);
                 else openOEMSettings(activity); // orientation: exact screen not mapped yet
                 return;
             case PICTURE:
                 openOEMSettings(activity); // use native picture/camera settings, no unverified intents
                 return;
             case SOURCES:
-                if (item == 0) {
+                if (item == 0 || item == 3) {
                     if (!launchOEM(activity, "com.droidlogic.tvinput",
                             "com.droidlogic.tvinput.settings.TvSettingsActivity")) {
                         openOEMSettings(activity);
