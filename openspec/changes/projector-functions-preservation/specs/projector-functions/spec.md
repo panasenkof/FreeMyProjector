@@ -44,6 +44,22 @@ An external launcher SHALL not invoke automatic calibration or change picture se
 - **WHEN** an alias such as `START_AUTO_KEYSTONE` may initiate a hardware action
 - **THEN** do not auto-run it on installation or navigation; reserve actual tests for a separate consented and reversible device pilot.
 
+### Requirement: Strictly passive OEM alias preflight
+
+The application MAY inspect factory `com.fengmi.projector.imaging` component metadata only on exact audited MiProjM05/eva Android 9 build `.4185`. Inspection SHALL NOT start activities, trigger autofocus/autocalibration or silently elevate permissions.
+
+#### Scenario: Focus/keystone aliases exist
+- **WHEN** the factory focus/keystone alias matches the manifest-observed target `ImagingFeatureActivity`, is enabled/exported and requires no OEM permission
+- **THEN** prepare an explicit Intent as inert data; do not launch the screen or expose a UI shortcut until a separate approval and live test.
+
+#### Scenario: Firmware or access differs
+- **WHEN** firmware is not exact, aliases are missing, disabled, nonexported, retargeted or permission-protected
+- **THEN** return fail-closed and do not attempt any OEM action.
+
+#### Scenario: Automated calibration remains blocked
+- **WHEN** a developer attempts to add AutoKeystone/Guide or hardware adjustment to this passive bridge
+- **THEN** static safety tests SHALL reject the change, and the existing HOME safety gate remains closed.
+
 ### Requirement: Port safe ADB authorization fix for Android 9
 The Android ADB client SHALL support bounded signed-only reconnection during first authorization on Android 8–10 without issuing system-modification commands.
 

@@ -89,6 +89,28 @@ def verify() -> tuple[str, int]:
     )
     for pkg in mi_proj_keep:
         assert f'"{pkg}"' in protected, f"MiProjM05 package must remain protected: {pkg}"
+    # P-04A: factory imaging bridge is a passive metadata probe, not an OEM launch.
+    oem = (ROOT / "app/src/io/freemytv/ProjectorFactoryScreens.java").read_text(encoding="utf-8")
+    for required in (
+        'Build.VERSION.SDK_INT == 28',
+        '"MiProjM05".equals(Build.MODEL)',
+        '"eva".equals(Build.DEVICE)',
+        '"PQ3B.190705.003.4185".equals(Build.DISPLAY)',
+        'pm.getActivityInfo(', '!info.exported', 'info.permission != null',
+        'TARGET.equals(info.targetActivity)',
+        'START_FOCUS', 'START_KEYSTONE',
+        'case FOCUS:', 'case KEYSTONE:',
+    ):
+        assert required in oem, f"OEM passive preflight guard missing: {required}"
+    for forbidden in ('START_AUTO_KEYSTONE', 'AutoKeystoneActivity',
+                      'Runtime.getRuntime', 'ProcessBuilder', 'settings put',
+                      'set-home-activity', 'pm disable'):
+        assert forbidden not in oem, f"Forbidden OEM/ADB operation in passive preflight: {forbidden}"
+    oem_without_comments = re.sub(r"/\*.*?\*/|//[^\n]*", "", oem, flags=re.DOTALL)
+    assert re.search(r"\bstartActivity\s*\(", oem_without_comments) is None, (
+        "OEM bridge must never start an OEM Activity"
+    )
+
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
