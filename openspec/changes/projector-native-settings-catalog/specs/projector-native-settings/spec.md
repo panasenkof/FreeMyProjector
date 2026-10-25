@@ -1,5 +1,7 @@
 # Capability: projector-native-settings
 
+## ADDED Requirements
+
 ### Requirement: native-only projector capabilities
 
 FreeMyProjector SHALL expose all owner-reported existing MiProjM05 capabilities except 3D as user-invoked navigation shortcuts, without implementing or triggering motor/keystone/HAL/HDMI/BT/system modification itself.
