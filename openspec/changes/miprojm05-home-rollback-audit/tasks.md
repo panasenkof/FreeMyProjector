@@ -29,6 +29,8 @@
 - [x] Add P-04E read-only user 0 scoping check and offline fake ADB regressions, including Android chooser HOME rejection. Hardware scope check pending CI and owner run.
 - [x] Owner executed P-04E real-device check on MiProjM05 `.4185` 25.10.2026: `user0-matches-baseline`, active Android user 0, implicit/explicit=114, 0 disabled, 0 discrepancies vs baseline, SHA match and zero device writes.
 - [x] Document P-04F Android 9 recovery gates G0-G6, marking confirmed evidence and missing emergency/OEM/firmware proofs; this is a **design protocol only**.
+- [x] Record owner's 25.10.2026 failed USB keyboard trial as *not verified fallback*, without claiming USB HID is impossible; details in `docs/P04F_USB_KEYBOARD_FAILURE.md`.
+- [ ] Clarify wired USB vs wireless receiver, test keyboard with PC, optionally check safe read-only USB flash visibility, and research an independent fallback; never change HOME based on an unverified USB keyboard.
 - [ ] Demonstrate an independent physical recovery/control path, obtain picture/optics/pairing baseline evidence and validate actual Android 9 HOME restoration only in a separately approved and safe hardware procedure.
 - [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
 - [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
