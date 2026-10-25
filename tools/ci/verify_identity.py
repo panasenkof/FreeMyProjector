@@ -106,11 +106,10 @@ def verify() -> tuple[str, int]:
                       'Runtime.getRuntime', 'ProcessBuilder', 'settings put',
                       'set-home-activity', 'pm disable'):
         assert forbidden not in oem, f"Forbidden OEM/ADB operation in passive preflight: {forbidden}"
-    assert re.search(r"\bstartActivity\s*\(", oem) is None or (
-        re.search(r"\bstartActivity\s*\(", oem).group(0) and
-        all(not re.search(r"\bstartActivity\s*\(", line)
-            for line in oem.splitlines() if not line.strip().startswith(('*', '//')))
-    ), "OEM bridge must not launch activities"
+    oem_without_comments = re.sub(r"(?s)/\*.*?\*/|(?m)//[^\n]*", "", oem)
+    assert re.search(r"\bstartActivity\s*\(", oem_without_comments) is None, (
+        "OEM bridge must never start an OEM Activity"
+    )
 
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
