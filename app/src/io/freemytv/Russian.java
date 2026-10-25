@@ -19,6 +19,8 @@ final class Russian {
             case "Home Settings": return "Главный экран";
             case "TV Settings": return "Настройки ТВ";
             case "Projector features": return "Функции проектора";
+            case "Optics settings": return "Оптика";
+            case "Power settings": return "Питание";
             case "Automatic keystone": return "Автоматическая трапеция";
             case "Keystone calibration": return "Калибровка трапеции";
             case "HDMI zoom": return "Масштаб HDMI";
