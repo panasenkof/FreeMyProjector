@@ -65,6 +65,25 @@ $user0 = $cmd.EndsWith(' --user 0')
 if ($user0 -and $case -eq 'scope-user0-unsupported') { 'Error: Unknown option: --user'; return }
 if ($user0 -and $case -eq 'scope-user0-diff') { $off = @() }
 if ($user0 -and $case -eq 'scope-user0-protected-disabled') { $off = @('com.fengmi.projector.imaging') }
+if ($cmd -eq 'shell cmd package resolve-activity --brief -a android.settings.BLUETOOTH_SETTINGS') {
+    if ($case -eq 'pairing-none') { 'No activity found'; return }
+    'com.android.tv.settings/.bluetooth.BluetoothSettingsActivity'; return
+}
+if ($cmd -eq 'shell cmd package query-activities --brief -a android.settings.BLUETOOTH_SETTINGS') {
+    if ($case -eq 'pairing-none') { 'No activities found'; return }
+    'com.android.tv.settings/.bluetooth.BluetoothSettingsActivity'; return
+}
+if ($cmd -match '^shell dumpsys package (com\.android\.tv\.settings|com\.fengmi\.fmsettings|com\.formovie\.gsettings)$') {
+    if ($case -eq 'pairing-none') { 'Nothing exported'; return }
+    if ($Matches[1] -eq 'com.android.tv.settings') {
+        'Activity Resolver Table:'
+        '  com.android.tv.settings/.accessories.AddAccessoryActivity'
+        '  com.android.tv.settings/.bluetooth.BluetoothSettingsActivity'
+        '  serial=private-secret-never-print ip=192.168.7.3'
+    }
+    if ($Matches[1] -eq 'com.fengmi.fmsettings') { 'com.fengmi.fmsettings/.ui.RemotePairActivity' }
+    return
+}
 if ($cmd -in @('shell pm list packages','shell pm list packages --user 0')) {
     $all | ForEach-Object { "package:$_" }
     return
