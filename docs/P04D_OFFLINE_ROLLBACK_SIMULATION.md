@@ -44,6 +44,8 @@ $folder = 'D:\Git\FreeMyProjector\MiProjM05-baseline-20261025-091132-80cc72ea6d'
 .\tests\Test-ProjectorRollbackSimulation.ps1
 ```
 
+**Результат владельца 25.10.2026:** офлайн-тест с настоящим SHA-проверенным baseline завершился `status=passed`, 5/5 сценариев проверены, две внесённые аварии ожидаемо обнаружены, `original_snapshot_unchanged=true`, `device_access=none`, `device_writes=0`. Реальный проектор не менялся. Следующая проверка: [P-04E user 0, read-only](P04E_USER0_READONLY_AUDIT.md).
+
 ## Что необходимо ДО реального rollback
 
 - Отдельный детально проверенный **write-стек** для Android 9 без `cmd role` как универсального fallback, с проверкой фактически выбранного HOME после каждой операции и документированием всех ошибок.
