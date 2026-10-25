@@ -290,7 +290,11 @@ final class HomeMode {
         if (adb.shell("pm list packages -d --user 0")
                 .contains("package:com.google.android.tvlauncher")) return false;
         String expected = canonicalComponent(MIPROJ_STOCK_HOME);
-        if (expected.equals(resolvedHomeComponent(adb))) return true;
+        String observed = resolvedHomeComponent(adb);
+        if (expected.equals(observed)) return true;
+        // A chooser/fallback/unknown/foreign HOME is ambiguous: STOP without
+        // speculative changes. Only revert a HOME that we ourselves owned.
+        if (!canonicalComponent(HOME_ACTIVITY).equals(observed)) return false;
         String result = adb.shell("cmd package set-home-activity --user 0 '" + MIPROJ_STOCK_HOME + "'");
         return result.contains("Success") && expected.equals(resolvedHomeComponent(adb));
     }
