@@ -231,6 +231,22 @@ def verify() -> tuple[str, int]:
         for key in ('Projector features', 'Keystone calibration', 'HDMI zoom', 'All factory settings'):
             assert f'case "{key}":' in translations, f"Missing {language} catalog translation {key}"
 
+    # HDMI P-06H: off-device fail-closed routing; never assume a TvInputInfo
+    # has a trusted Android TV ACTION_VIEW handler on MiProjM05 firmware.
+    hdmi = (ROOT / "app/src/io/freemytv/HomeApps.java").read_text(encoding="utf-8")
+    for required in (
+        'if (it.inputId == null || it.inputId.isEmpty()) return openHdmiSettingsFallback(a);',
+        'isAuditedMiProjector()',
+        'PackageManager.MATCH_DEFAULT_ONLY',
+        'trustedHdmiViewer(info)',
+        'intent.setClassName(info.packageName, info.name)',
+        'info.exported', 'info.permission',
+        'ApplicationInfo.FLAG_SYSTEM',
+        '"com.droidlogic.tvinput".equals(info.packageName)',
+        'ProjectorSettingsNavigator.openFromUserTap(a, ProjectorSettingsNavigator.SOURCES, 0)',
+    ):
+        assert required in hdmi, f"HDMI handler cannot be verified/fallback missing: {required}"
+
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
