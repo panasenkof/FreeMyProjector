@@ -23,12 +23,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Original ⇄ Free My TV. "free": our home screen and screensaver, and the apps in the lists below turned off
- * (pm disable-user: still installed, back with one button). "original": everything as it came from the factory.
- *
- * It all goes through the TV's own ADB (Adb, 127.0.0.1:5555), which you allow once on the TV. The switches run as
- * background jobs (ModeJob) in the main process; the settings screen (the :home process) asks for them and follows the
- * state file. Only the TV itself asks for switches: nothing here listens to the network.
+ * P-04 protected MiProjM05 HOME compatibility paths. The stock Android TV HOME,
+ * OEM packages, accessibility services and screensaver must remain untouched by
+ * FreeMyProjector. This preview build refuses to apply a new HOME.
+ * Recovery, if separately approved in a future pilot, requires exact stock HOME
+ * readback before success. Local ADB use is not an independent hardware recovery
+ * guarantee; enabling TCP ADB on port 5555 may also expose a network attack surface.
  */
 final class HomeMode {
     private HomeMode() {}
@@ -53,9 +53,8 @@ final class HomeMode {
      */
     static final String GOOGLE_SETUP = "com.google.android.tungsten.setupwraith";
 
-    /**
-     * Turned off in Free My TV mode, when the TV has them. Google extras first, then TV-maker extras (TCL here; add
-     * your brand's, see the README). The TV's own home screen and screensaver are added at switch time.
+    /** Historical upstream package lists retained for source comparison only.
+     * ADR-001 forbids using them to disable the project's factory applications.
      */
     static final String[] DEBLOAT = {
         "com.google.android.play.games", "com.google.android.youtube.tvmusic",        // Play Games, YouTube Music
