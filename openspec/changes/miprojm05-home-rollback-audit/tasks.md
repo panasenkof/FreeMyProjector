@@ -32,6 +32,12 @@
 - [x] Record owner's 25.10.2026 failed USB keyboard trial as *not verified fallback*, without claiming USB HID is impossible; details in `docs/P04F_USB_KEYBOARD_FAILURE.md`.
 - [x] Owner clarified on 25.10.2026: the USB keyboard is **wireless with a USB receiver (dongle)**; keyboard/receiver enumeration on projector and operation on PC not tested. Do not conflate with native Bluetooth HID pairing.
 - [x] Plan P-04G staged ADB recovery and vendor remote-pairing integration without activating HOME or changing OEM service; see `docs/P04G_ADB_RECOVERY_REMOTE_PAIRING_DESIGN.md`.
+- [x] Implement P-04H **read-only** OEM pairing candidate finder and offline fake-ADB tests; wait for owner-provided sanitized output before claiming exact .4185 OEM Activity.
+- [x] Prepare **user-initiated** Remote & Bluetooth settings entry using trusted Android Settings intent with general settings fallback, no auto-pair.
+- [x] Research all supported factory features against Xiaomi spec, FAQ, manual/reviews; [feature matrix](../../../docs/MIPROJM05_STOCK_FEATURE_MATRIX.md) lists evidence, unknowns and P0/P1/P2 priorities.
+- [x] Document P-04I one-time 30-minute trial HOME auto-rollback watchdog concept, cancellation only from deliberate remote confirmation and independent PC controller; no write implementation.
+- [ ] Build P-04I offline state-machine and failure tests, then independent PC watcher, only after hardware gates and separate approval.
+- [ ] No USB keyboard or IR remote as recovery fallback: owner's choice and official device limitations.
 - [ ] Discover vendor-specific pairing Activity, exported/permission status and generic settings fallback read-only on `.4185` before any device Activity launch; retain manual access from P-06.
 - [ ] Research reliable Android 9 connected-state detection for the exact remote; do not enable automatic pairing on boot until supported by real data and explicit user preference.
 - [ ] Clarify wired USB vs wireless receiver, test keyboard with PC, optionally check safe read-only USB flash visibility, and research an independent fallback; never change HOME based on an unverified USB keyboard.
