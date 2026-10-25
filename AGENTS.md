@@ -26,6 +26,7 @@ Keep upstream `CLAUDE.md` for historical guidance, **but do not follow its model
 - Never execute or recommend disabling, deleting or reconfiguring a Xiaomi system app, Wi-Fi, launcher or recovery without exact-firmware investigation, a documented rollback and the owner's explicit go-ahead.
 - No root by default; no bypassing safety measures to make switching HOME work.
 - Backward-compatible, recoverable updates are mandatory. Preserving access to the factory home screen is a P0 requirement.
+- **ADR-001 (P0):** [обратимая замена HOME через пользовательский APK](docs/ADR-001-REVERSIBLE-LAUNCHER.md) — обязательна для всех изменений. Наш APK должен безопасно устанавливаться/обновляться/удаляться; штатный Launcher и все OEM-компоненты остаются активными. Никаких root, перепрошивки или отключения заводского HOME; тестирование на устройстве и независимый путь отката обязательны до HOME-пилота.
 - Keep privacy and secrets out of Git, logs and PRs: no API keys, private tokens, keystores, device serials, MAC addresses or user network addresses.
 - This is initially Android TV / Android 9; keep the existing Java, no-Gradle `build.sh` build unless the spec justifies changing it.
 - P-03 identity: manifest app ID `com.fader.freemyprojector`, original Java package `io.freemytv` (absolute component class names), release signing only with private owner-controlled PKCS12 credentials. **Do not reintroduce hard-coded signing keys or passwords**. Ordinary PR builds remain unsigned and use no release secrets. See [docs/RELEASE_SIGNING.md](docs/RELEASE_SIGNING.md).
