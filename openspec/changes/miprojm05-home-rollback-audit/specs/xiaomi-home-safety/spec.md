@@ -136,6 +136,21 @@ The owner SHALL be able to validate a saved P-04B snapshot offline and review cu
 - **WHEN** a package was disabled in the snapshot and is enabled now
 - **THEN** report the original disabled state for separate review; never automatically enable or disable packages, delete added packages or treat `FallbackHome` as working HOME.
 
+### Requirement: Offline rollback simulation without authority to mutate
+An offline simulator SHALL calculate and verify a **hypothetical** Android 9 restoration from a checksum-verified private P-04B baseline, a fabricated current-device state and an explicit change journal. It SHALL have no ADB or Android write capability.
+
+#### Scenario: No changes or second invocation
+- **WHEN** the mock device is already identical to the baseline
+- **THEN** no restoration action is proposed and the result is marked mock-verified.
+
+#### Scenario: Journalled HOME and packages
+- **WHEN** a hypothetical HOME switch and per-package state change are explicitly journalled, device firmware and original stock HOME match, and all protected services remain enabled
+- **THEN** the simulator plans HOME restoration and only the journalled changes, preserving packages disabled before the experiment, and compares the simulated result to the baseline.
+
+#### Scenario: Unknown drift, emergency failures and unsupported states
+- **WHEN** the mock state has unjournalled state changes, missing baseline package, protected service modification, FallbackHome, wrong firmware, corrupt SHA or an injected step failure
+- **THEN** fail closed or flag mock failure; never issue device commands or claim physical recovery was tested.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 
