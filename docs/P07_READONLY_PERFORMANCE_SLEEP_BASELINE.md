@@ -52,3 +52,15 @@
 4. После настоящего измерения сформировать план оптимизации по реальным отклонениям и отдельно проверить, не нарушено ли штатное поведение сна.
 
 Связано: [P-05](P05_SAFE_PREVIEW_APK_TEST.md), [P-04F](P04F_ANDROID9_RECOVERY_GATES.md), [риски ADB и сна](P04S_ADB_SECRETS_SLEEP_SECURITY.md), [ревью](REVIEW_FIXES_2026-10-25.md).
+
+## Пробный сборщик P-07 (пока не аппаратно проверен)
+
+После слияния кода и лишь при готовности выполнить чтение с локального ПК:
+
+```powershell
+.\tools\Measure-ProjectorMemoryReadOnly.ps1 -SnapshotDirectory $folder -AdbPath $adb -Phase stock-before
+```
+
+Команда только читает RAM при совпадении P-04E user0/baseline и активном заводском HOME. Для стадий после отдельно разрешённой установки APK использовать `-Phase preview-stock-home`, `preview-settings` либо `preview-after-back`; скрипт не устанавливает APK. Вывод содержит единственную выборку. `app_pss_kib` может остаться `null`, если `dumpsys` не даёт однозначный формат. CPU, FPS и температура не измеряются, а сон наблюдается вручную. Нужны как минимум три раздельные выборки в сопоставимых условиях; не интерпретировать один замер как регрессию.
+
+Статические тесты: `python -m unittest discover -s tools/ci -p 'test_p07_readonly_probe.py'`. Они не заменяют выполнение PowerShell с mock ADB на Windows и реальную проверку на проекторе.

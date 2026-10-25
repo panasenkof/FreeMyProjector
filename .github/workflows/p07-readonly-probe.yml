@@ -1,0 +1,43 @@
+name: P-07 PowerShell probe safety
+on:
+  pull_request:
+    paths:
+      - 'tools/Measure-ProjectorMemoryReadOnly.ps1'
+      - 'tools/ci/test_p07_readonly_probe.py'
+      - '.github/workflows/p07-readonly-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe-static-and-parse:
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell 5.1 script without execution
+        shell: powershell
+        run: |
+          $file = Join-Path $env:GITHUB_WORKSPACE 'tools/Measure-ProjectorMemoryReadOnly.ps1'
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$errors)
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
+      - name: Run read-only static regression tests
+        shell: pwsh
+        run: python -m unittest discover -s tools/ci -p "test_p07_readonly_probe.py" -v
+      - name: Fail closed on missing snapshot (mock failure)
+        shell: powershell
+        run: |
+          $errorText = ''
+          try {
+            & .\tools\Measure-ProjectorMemoryReadOnly.ps1 -SnapshotDirectory "$env:RUNNER_TEMP\missing-p07-snapshot" -AdbPath "nonexistent-adb-p07.exe" -ErrorAction Stop | Out-Null
+            throw 'Probe unexpectedly succeeded'
+          } catch {
+            $errorText = $_.Exception.Message
+          }
+          if ($errorText -notmatch 'P-07 STOP: Snapshot folder missing') { throw "Unexpected fail-closed outcome" }
