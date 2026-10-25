@@ -25,7 +25,9 @@
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
 - [x] Add P-04D offline-only mock simulator for Android 9 HOME and package rollback based on SHA-verified baseline + explicit change journal (failure injection; idempotency; protected packages). CI must verify; no device write implementation exists.
 - [x] Add one-command local Windows offline mock-rollback runner using owner's SHA-verified baseline without ADB/Android writes, plus temp-fixture cleanup and mocked CI coverage; owner-side execution remains pending.
-- [ ] Owner to run `tools/Test-ProjectorRollbackLocally.ps1` against the saved 114-package baseline and report only redacted console summary.
+- [x] Owner executed `tools/Test-ProjectorRollbackLocally.ps1` with original 114-package SHA-verified baseline on 25.10.2026: `status=passed`, `OFFLINE_MOCK_ONLY`, 5 cases, original unchanged, 0 ADB/physical writes. Injected faults were correctly detected. This is NOT actual firmware/HOME rollback.
+- [x] Add P-04E read-only user 0 scoping check and offline fake ADB regressions, including Android chooser HOME rejection. Hardware scope check pending CI and owner run.
+- [ ] Owner to verify user 0 package-scope semantics on `.4185` using read-only `tools/Test-ProjectorUser0Scope.ps1`, no syswrites, no baseline overwrite.
 - [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
 - [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
 
