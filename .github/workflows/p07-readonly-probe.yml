@@ -32,6 +32,9 @@ jobs:
       - name: Execute offline memory parser regressions
         shell: powershell
         run: .\\tools\\ci\\p07\\Test-ProjectorMemoryParsers.ps1
+      - name: End-to-end offline fake ADB and snapshot tests
+        shell: powershell
+        run: .\\tools\\ci\\p07\\Test-ProjectorReadOnlyMockAdb.ps1
       - name: Run read-only static regression tests
         shell: pwsh
         run: python -m unittest discover -s tools/ci -p "test_p07_readonly_probe.py" -v
