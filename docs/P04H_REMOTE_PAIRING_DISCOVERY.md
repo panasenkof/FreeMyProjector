@@ -1,5 +1,9 @@
 # P-04H — безопасное обнаружение заводского экрана сопряжения
 
+**Найден наиболее вероятный заводской экран:** `com.android.tv.settings/.accessories.AddAccessoryActivity` на реальном MiProjM05/eva Android9 build `.4185`. В AOSP Android TV эта Activity прямо предназначена для поиска и сопряжения Bluetooth-устройств и обычно экспортируется для действия `com.google.android.intent.action.CONNECT_INPUT`: [AOSP исходный класс](https://android.googlesource.com/platform/packages/apps/TvSettings/+/293380a/Settings/src/com/android/tv/settings/accessories/AddAccessoryActivity.java), [AOSP Manifest](https://android.googlesource.com/platform/packages/apps/TvSettings/+/29e0208/Settings/AndroidManifest.xml). **На прошивке владельца экспортируемость, permission и реальный запуск пока не испытаны**. Поэтому это обоснованный адресный кандидат, а не доказанная работоспособность.
+
+**Принятый отчёт владельца 25.10.2026:** `status=candidates-found-not-validated`, `user=0`, firmware verified, обе выборки `android.settings.BLUETOOTH_SETTINGS` пусты, кандидаты: `AddAccessoryActivity`, `BluetoothDevicePickerActivity`, `BluetoothPairingDialog`, `BluetoothPairingRequest`, `BluetoothRequestPermissionActivity`, `FMBlePairingDialog`, `BluetoothSpeakerMode`, `DeviceNameSettingsActivity`. `device_writes=0`, HOME blocked. **Диалоги и BluetoothSpeakerMode не открывать напрямую**.
+
 **Точная OEM Activity на MiProjM05/.4185 пока не известна**. Скрипт читает package resolver и три заводских пакета без запуска Activity, изменений Bluetooth, HOME или файлов.
 
 ## Команда после обновления main
