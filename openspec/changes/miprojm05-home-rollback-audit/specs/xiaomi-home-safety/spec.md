@@ -163,6 +163,21 @@ The owner SHALL be able to run a mock-only restoration exercise on Windows Power
 - **WHEN** the checksum fails or simulated restoration faults are injected
 - **THEN** reject invalid data before preparing test scenarios, and report expected mock failures with `device_access=none`, `device_writes=0`, `home_switch_blocked=true` without touching the projector or original snapshot.
 
+### Requirement: Explicit Android user 0 scope preflight is read only
+The P-04E Windows helper SHALL first verify the existing snapshot hash without ADB, then query the exact MiProjM05/eva Android 9 build, active user, and implicit versus explicit `pm list packages --user 0` states. It SHALL not write any device or baseline data and SHALL not claim real recovery from a matching scope.
+
+#### Scenario: User 0 equals baseline
+- **WHEN** an authorized MiProjM05/.4185 reports active user 0 and complete implicit/explicit user-0 package lists matching the saved SHA-verified baseline
+- **THEN** report only counts and `user0-matches-baseline`; never change the projector or output private package names.
+
+#### Scenario: Unexpected multiuser, unsupported option or changed OEM package
+- **WHEN** the active user differs, user-scoped flag is rejected, enabled/disabled lists contradict, or a protected factory package is missing/disabled
+- **THEN** stop with a sanitized error and keep all HOME/packaging writes blocked.
+
+#### Scenario: Android chooser in HOME detection
+- **WHEN** the current HOME is an Android `ResolverActivity` / chooser rather than a supported launcher
+- **THEN** refuse to treat it as a valid recovery HOME, and do not offer a restorability conclusion.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 

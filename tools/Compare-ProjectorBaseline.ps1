@@ -166,7 +166,9 @@ $homeResult = Read-Adb -Arguments @('shell','cmd','package','resolve-activity','
 $homeComponents = @($homeResult -split '\r?\n' | Where-Object { ComponentName $_ })
 if ($homeComponents.Count -ne 1) { Fail 'Ambiguous or unresolved live HOME' }
 $currentHome = [string]$homeComponents[0]
-if ($currentHome -match '(?i)FallbackHome|SetupWizard') { Fail 'Fallback/setup HOME is not restorable HOME' }
+if ($currentHome -match '(?i)FallbackHome|SetupWizard|ResolverActivity|ChooserActivity|RecoveryActivity') {
+    Fail 'Fallback/chooser/setup HOME is not a valid recovery target'
+}
 
 $claims = Read-Adb -Arguments @('shell','cmd','package','query-activities','--brief',
     '-a','android.intent.action.MAIN','-c','android.intent.category.HOME')
