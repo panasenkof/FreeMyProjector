@@ -48,6 +48,8 @@ Set-Clipboard -Value ""
 
 ## 4. Запусти сборку установочного APK
 
+**Актуальный безопасный P-05:** текущий подписанный релиз `v0.1.0` уже опубликован; следующий тестовый APK будет **`v0.1.1`** с меню P-06 и отключёнными в AndroidManifest HOME/автозапуском/службой перехвата клавиш. После слияния P-05 нажать [Run workflow](https://github.com/panasenkof/FreeMyProjector/actions/workflows/signed-release.yml) на `main`; он возьмёт **тот же ключ**, создаст prerelease и проверит *бинарный* манифест. [P-05 инструкция и чек-лист](P05_SAFE_PREVIEW_APK_TEST.md). Старый `v0.1.0` не подходит для аппаратной проверки нового меню.
+
 После слияния P-03:
 
 1. Открой [GitHub Actions](https://github.com/panasenkof/FreeMyProjector/actions).
