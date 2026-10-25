@@ -88,8 +88,8 @@ def verify() -> tuple[str, int]:
     assert f'static final String PKG = "{PACKAGE}"' in homemode, "Incorrect HOME app ID"
     assert 'static final String JAVA_CLASS_PREFIX = "io.freemytv."' in homemode, "Incorrect HOME class namespace"
     assert 'PROJECTOR_HOME_SWITCH_AUDITED = false' in job, "P-04 HOME safety lock unexpectedly enabled"
-    assert "if (!PROJECTOR_HOME_SWITCH_AUDITED) return;" in job, "ADB schedule guard missing"
-    assert "if (!PROJECTOR_HOME_SWITCH_AUDITED) return false;" in job, "ADB execution guard missing"
+    assert "if (!permitted(action)) return;" in job, "ADB schedule guard missing"
+    assert "if (!permitted(action)) return false;" in job, "ADB execution guard missing"
     assert "freemytv.keystore" not in build, "Legacy keystore usage still exists"
     assert "pass:freemytv" not in build, "Legacy static signing password still exists"
     assert 'keytool -genkeypair' not in build.lower(), "Build must not generate signing keys"
@@ -104,7 +104,15 @@ def verify() -> tuple[str, int]:
     for prefix in ('com.fengmi.', 'com.formovie.', 'cn.formovie.', 'com.droidlogic.'):
         assert f'pkg.startsWith("{prefix}")' in guard[1], f"Missing OEM prefix protection: {prefix}"
     assert 'pkg.equals("com.droidlogic")' in guard[1], "Droidlogic root package must be protected"
-    assert homemode.count("if (isProtectedPackage(pkg) ||") == 2, "Disabling path bypasses OEM guard"
+    assert 'PROJECTOR_RECOVERY_AUDITED = false' in job, "Recovery approval must remain locked"
+    assert 'if (REVERT.equals(action)) return PROJECTOR_RECOVERY_AUDITED;' in job
+    assert 'if (APPLY.equals(action) || VERIFY.equals(action)) return PROJECTOR_HOME_SWITCH_AUDITED;' in job
+    assert 'if (!ModeJob.PROJECTOR_RECOVERY_AUDITED) return;' in homemode
+    assert 'MIPROJ_STOCK_HOME = "com.google.android.tvlauncher/.MainActivity"' in homemode
+    assert 'expected.equals(resolvedHomeComponent(adb))' in homemode, "Rollback must verify exact HOME after write"
+    for unsafe in ('adb.shell("pm disable-user', 'adb.shell("pm enable ', 'cmd role remove-role-holder',
+                   'adb.shell("settings put secure screensaver_components'):
+        assert unsafe not in homemode, f"ADR-001 forbidden factory mutation remains: {unsafe}"
     protected = homemode.split("private static final Set<String> PROTECTED =", 1)
     assert len(protected) == 2, "Missing protected package list"
     protected = protected[1].split("));", 1)[0]

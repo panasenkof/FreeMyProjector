@@ -18,11 +18,21 @@ public class ModeJob extends JobService {
     // Stops ALL ADB-backed jobs, including boot/update/recovery jobs. Do not toggle
     // for a release before confirming behavior on the actual Xiaomi firmware.
     static final boolean PROJECTOR_HOME_SWITCH_AUDITED = false;
+    // Independent gate: a future verified rollback must not require enabling
+    // potentially destructive HOME/APPLY/VERIFY behavior. Also locked for P-05.
+    static final boolean PROJECTOR_RECOVERY_AUDITED = false;
+
+    private static boolean permitted(String action) {
+        if (REVERT.equals(action)) return PROJECTOR_RECOVERY_AUDITED;
+        if (APPLY.equals(action) || VERIFY.equals(action)) return PROJECTOR_HOME_SWITCH_AUDITED;
+        // No unattended Accessibility/metrics modifications on this projector.
+        return false;
+    }
 
     @Override public boolean onStartJob(JobParameters params) {
-        if (!PROJECTOR_HOME_SWITCH_AUDITED) return false;
         PersistableBundle extras = params.getExtras();
         final String action = extras.getString("action", "");
+        if (!permitted(action)) return false;
         final String mode = extras.getString("mode", "");
         final Context app = getApplicationContext();
         new Thread(() -> {
@@ -49,7 +59,7 @@ public class ModeJob extends JobService {
 
     /** Schedules a job (one pending per action: a new request replaces the old one). */
     static void schedule(Context c, String action, String mode, long delayMs) {
-        if (!PROJECTOR_HOME_SWITCH_AUDITED) return;
+        if (!permitted(action)) return;
         JobScheduler scheduler = c.getSystemService(JobScheduler.class);
         if (scheduler == null) return;
         PersistableBundle extras = new PersistableBundle();
