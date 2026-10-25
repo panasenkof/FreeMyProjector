@@ -84,6 +84,8 @@ jobs:
           unzip -tqq out/aligned.apk
           "$BT/zipalign" -c -p 4 out/aligned.apk
           "$BT/aapt2" dump badging out/aligned.apk > out/ci-badging.txt
+          "$BT/aapt2" dump xmltree out/aligned.apk AndroidManifest.xml > out/ci-manifest.txt
+          python3 tools/ci/verify_trial_manifest.py out/ci-manifest.txt
           grep -Eq "^package: name='com\.fader\.freemyprojector'" out/ci-badging.txt
           grep -Fq "sdkVersion:'28'" out/ci-badging.txt
           grep -Fq "targetSdkVersion:'33'" out/ci-badging.txt
@@ -101,6 +103,7 @@ jobs:
             echo "Android minSdk: 28"
             echo "Android targetSdk: 33"
             echo "Hardware test: NOT PERFORMED"
+            echo "P-05 preview: HOME Activity, boot receiver, remote key service DISABLED"
             echo "Signed installation APK is available only through the manual release workflow, with private secrets."
           } > out/ci-artifacts/BUILD-REPORT.txt
           test ! -e freemytv.keystore
