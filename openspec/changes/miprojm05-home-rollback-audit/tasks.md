@@ -38,6 +38,9 @@
 - [x] Document P-04I one-time 30-minute trial HOME auto-rollback watchdog concept, cancellation only from deliberate remote confirmation and independent PC controller; no write implementation.
 - [ ] Build P-04I offline state-machine and failure tests, then independent PC watcher, only after hardware gates and separate approval.
 - [ ] No USB keyboard or IR remote as recovery fallback: owner's choice and official device limitations.
+- [x] Owner ran P-04H on `.4185`: `AddAccessoryActivity` plus six other accessories dialogs/services identified, Bluetooth Settings resolver empty, user 0/build verified, 0 writes. AOSP verifies this is an accessory pairing entry; *exported/permission on actual firmware and physical launch still untested*.
+- [x] Implement exact-firmware gated explicit `AddAccessoryActivity` Intent from manual settings tap only, checking package/system/exported/enabled/permission at runtime; retain fallback to generic TV settings and static CI regression assertions.
+- [ ] Physically verify direct Activity preflight and actual screen from a separately approved signed APK while original HOME remains active, without unpairing the current remote; if blocked, only fallback to general Settings.
 - [ ] Discover vendor-specific pairing Activity, exported/permission status and generic settings fallback read-only on `.4185` before any device Activity launch; retain manual access from P-06.
 - [ ] Research reliable Android 9 connected-state detection for the exact remote; do not enable automatic pairing on boot until supported by real data and explicit user preference.
 - [ ] Clarify wired USB vs wireless receiver, test keyboard with PC, optionally check safe read-only USB flash visibility, and research an independent fallback; never change HOME based on an unverified USB keyboard.
