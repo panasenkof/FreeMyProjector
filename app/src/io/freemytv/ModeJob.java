@@ -24,7 +24,9 @@ public class ModeJob extends JobService {
 
     private static boolean permitted(String action) {
         if (REVERT.equals(action)) return PROJECTOR_RECOVERY_AUDITED;
-        return PROJECTOR_HOME_SWITCH_AUDITED;
+        if (APPLY.equals(action) || VERIFY.equals(action)) return PROJECTOR_HOME_SWITCH_AUDITED;
+        // No unattended Accessibility/metrics modifications on this projector.
+        return false;
     }
 
     @Override public boolean onStartJob(JobParameters params) {
