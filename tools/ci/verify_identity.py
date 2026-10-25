@@ -106,7 +106,7 @@ def verify() -> tuple[str, int]:
                       'Runtime.getRuntime', 'ProcessBuilder', 'settings put',
                       'set-home-activity', 'pm disable'):
         assert forbidden not in oem, f"Forbidden OEM/ADB operation in passive preflight: {forbidden}"
-    oem_without_comments = re.sub(r"(?s)/\*.*?\*/|(?m)//[^\n]*", "", oem)
+    oem_without_comments = re.sub(r"/\*.*?\*/|//[^\n]*", "", oem, flags=re.DOTALL)
     assert re.search(r"\bstartActivity\s*\(", oem_without_comments) is None, (
         "OEM bridge must never start an OEM Activity"
     )
