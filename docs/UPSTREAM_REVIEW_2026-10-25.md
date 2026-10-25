@@ -11,7 +11,7 @@
 ## Что нового в Free My TV 1.2.0
 
 Версия [v1.2.0](https://github.com/simbasjungles/free-my-tv/releases/tag/v1.2.0) опубликована **24.10.2026**. Из коммитов:
-- [Исправление HDMI / MIUI TV](https://github.com/simbasjungles/free-my-tv/commit/b93b5c34c): проверка фирменного плеера источников, запросы package visibility. **Не переносить напрямую** на Amlogic/Fengmi, где HDMI обслуживает `com.droidlogic.tvinput`; нужен OEM-специфический путь.
+- [Исправление HDMI / MIUI TV](https://github.com/simbasjungles/free-my-tv/commit/feb73f03d): проверка фирменного плеера источников, запросы package visibility. **Не переносить напрямую** на Amlogic/Fengmi, где HDMI обслуживает `com.droidlogic.tvinput`; нужен OEM-специфический путь.
 - [Российские сервисы](https://github.com/simbasjungles/free-my-tv/commit/59489bf26): Кинопоиск, Okko, Premier, Amediateka, Wink. **P1 — полезно для RU-интерфейса**, но не влияет на безопасность HOME и не ускоряет YouTube.
 - Исправление [screensaver в Android 12](https://github.com/simbasjungles/free-my-tv/commit/a7d56b1f0) — **не применимо** к Android 9/API28, не переносим.
 - Таймер сна, расширения полки и переводы — **P1/P2**; не переносить сейчас, чтобы не создавать конфликт с проекторными guards.
