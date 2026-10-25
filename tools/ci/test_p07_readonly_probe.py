@@ -41,7 +41,8 @@ class P07Safety(unittest.TestCase):
         c = self.code
         self.assertNotRegex(c, r'(?m)^\s*(?:Write-Host|Write-Output|echo)\s+\$')
         self.assertIn("ADB read failed", c)
-        self.assertIn("Missing or inconsistent memory counters", c)
+        self.assertIn("Invalid or inconsistent memory counters", c)
+        self.assertIn("ProjectorMemoryParsers.ps1", c)
 
     def test_documented_phase_and_unmeasured_metrics(self):
         c = self.code

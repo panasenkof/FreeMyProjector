@@ -83,25 +83,16 @@ if ($homeComponents.Count -ne 1 -or
     $homeComponents[0] -cne 'com.google.android.tvlauncher/.MainActivity') {
     Stop-Probe 'Factory HOME not unambiguously active'
 }
+$parserFile = Join-Path $PSScriptRoot 'ProjectorMemoryParsers.ps1'
+if (-not (Test-Path -LiteralPath $parserFile -PathType Leaf)) { Stop-Probe 'Memory parser missing' }
+. $parserFile
 $memoryText = Invoke-ProbeRead @('shell','cat','/proc/meminfo')
-$numbers = @{}
-foreach ($line in ($memoryText -split '\r?\n')) {
-    if ($line -cmatch '^(MemTotal|MemAvailable):\s+([0-9]+)\s+kB\s*$') {
-        if ($numbers.ContainsKey($Matches[1])) { Stop-Probe 'Duplicate memory field' }
-        $numbers[$Matches[1]] = [long]::Parse($Matches[2])
-    }
-}
-if (-not $numbers.ContainsKey('MemTotal') -or -not $numbers.ContainsKey('MemAvailable') -or
-    $numbers['MemTotal'] -le 0 -or $numbers['MemAvailable'] -lt 0 -or
-    $numbers['MemAvailable'] -gt $numbers['MemTotal']) {
-    Stop-Probe 'Missing or inconsistent memory counters'
-}
+try { $numbers = ConvertFrom-ProjectorMeminfo $memoryText }
+catch { Stop-Probe 'Invalid or inconsistent memory counters' }
 $appPss = $null
 if ($Phase -ne 'stock-before') {
     $appRaw = Invoke-ProbeRead @('shell','dumpsys','meminfo','com.fader.freemyprojector')
-    # Only accept an unambiguous summary PSS in kB; don't infer from a process list.
-    $pssMatches = @([regex]::Matches($appRaw,'(?m)^\s*TOTAL\s+([0-9]+)\s+[0-9]+\s+[0-9]+\s*$', 'IgnoreCase'))
-    if ($pssMatches.Count -eq 1) { $appPss = [long]::Parse($pssMatches[0].Groups[1].Value) }
+    $appPss = ConvertFrom-ProjectorPss $appRaw
 }
 [pscustomobject]@{
     schema_version = 1
@@ -110,8 +101,8 @@ if ($Phase -ne 'stock-before') {
     model = 'MiProjM05'
     build = 'PQ3B.190705.003.4185'
     stock_home_unchanged = $true
-    mem_total_kib = $numbers['MemTotal']
-    mem_available_kib = $numbers['MemAvailable']
+    mem_total_kib = $numbers.MemTotal
+    mem_available_kib = $numbers.MemAvailable
     app_pss_kib = $appPss
     app_pss_note = if ($null -eq $appPss) { 'not-available-or-not-unambiguous' } else { 'parsed-from-dumpsys-meminfo' }
     cpu = 'not-measured'
