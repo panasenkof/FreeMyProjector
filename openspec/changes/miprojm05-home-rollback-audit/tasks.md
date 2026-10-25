@@ -30,6 +30,10 @@
 - [x] Owner executed P-04E real-device check on MiProjM05 `.4185` 25.10.2026: `user0-matches-baseline`, active Android user 0, implicit/explicit=114, 0 disabled, 0 discrepancies vs baseline, SHA match and zero device writes.
 - [x] Document P-04F Android 9 recovery gates G0-G6, marking confirmed evidence and missing emergency/OEM/firmware proofs; this is a **design protocol only**.
 - [x] Record owner's 25.10.2026 failed USB keyboard trial as *not verified fallback*, without claiming USB HID is impossible; details in `docs/P04F_USB_KEYBOARD_FAILURE.md`.
+- [x] Owner clarified on 25.10.2026: the USB keyboard is **wireless with a USB receiver (dongle)**; keyboard/receiver enumeration on projector and operation on PC not tested. Do not conflate with native Bluetooth HID pairing.
+- [x] Plan P-04G staged ADB recovery and vendor remote-pairing integration without activating HOME or changing OEM service; see `docs/P04G_ADB_RECOVERY_REMOTE_PAIRING_DESIGN.md`.
+- [ ] Discover vendor-specific pairing Activity, exported/permission status and generic settings fallback read-only on `.4185` before any device Activity launch; retain manual access from P-06.
+- [ ] Research reliable Android 9 connected-state detection for the exact remote; do not enable automatic pairing on boot until supported by real data and explicit user preference.
 - [ ] Clarify wired USB vs wireless receiver, test keyboard with PC, optionally check safe read-only USB flash visibility, and research an independent fallback; never change HOME based on an unverified USB keyboard.
 - [ ] Demonstrate an independent physical recovery/control path, obtain picture/optics/pairing baseline evidence and validate actual Android 9 HOME restoration only in a separately approved and safe hardware procedure.
 - [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
