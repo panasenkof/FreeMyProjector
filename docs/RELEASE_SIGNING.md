@@ -79,7 +79,7 @@ Set-Clipboard -Value ""
 Подлинность можно проверить локально:
 
 ```powershell
-& "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.0.apk"
+& "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.1.apk"
 ```
 
 Это пример для типичного расположения Android SDK в Windows. Если SDK находится в другом каталоге, используй фактический путь к `build-tools\34.0.0\apksigner.bat`.
