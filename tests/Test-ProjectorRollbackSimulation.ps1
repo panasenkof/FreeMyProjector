@@ -57,11 +57,11 @@ function Build-Mock([string]$Scenario,[switch]$CustomHome,[switch]$ChangedPackag
 function Test-Success([string]$Label,[string]$MockPath,[int]$ExpectedSteps,[int]$FaultStep) {
     $result=(& $script:sim -BaselineDirectory $script:baselineFolder -ScenarioPath $MockPath -FailAtStep $FaultStep) | ConvertFrom-Json
     $expectedStatus=if($FaultStep -gt 0){'mock-failure-injected'}else{'mock-restored'}
-    Assert ($result.status -eq $expectedStatus) "$Label: wrong status"
-    Assert (@($result.planned_actions).Count -eq $ExpectedSteps) "$Label: incorrect count of expected actions"
-    Assert ($result.device_writes -eq 0 -and $result.physical_device_access -eq 'none') "$Label: must remain offline"
-    Assert ($result.home_switch_blocked -eq $true -and $result.mode -eq 'OFFLINE_MOCK_ONLY') "$Label: guard unavailable"
-    Assert ($result.mock_verification_passed -eq ($FaultStep -eq 0)) "$Label: verification fail/pass mismatch"
+    Assert ($result.status -eq $expectedStatus) "${Label}: wrong status"
+    Assert (@($result.planned_actions).Count -eq $ExpectedSteps) "${Label}: incorrect count of expected actions"
+    Assert ($result.device_writes -eq 0 -and $result.physical_device_access -eq 'none') "${Label}: must remain offline"
+    Assert ($result.home_switch_blocked -eq $true -and $result.mode -eq 'OFFLINE_MOCK_ONLY') "${Label}: guard unavailable"
+    Assert ($result.mock_verification_passed -eq ($FaultStep -eq 0)) "${Label}: verification fail/pass mismatch"
     Write-Host "PASS: $Label"
     return $result
 }
@@ -69,7 +69,7 @@ function Test-Refusal([string]$Label,[string]$MockPath,[string]$BaselineFolder) 
     $err=''
     try { & $script:sim -BaselineDirectory $BaselineFolder -ScenarioPath $MockPath | Out-Null }
     catch { $err=$_.Exception.Message }
-    Assert ($err -match '^P-04D OFFLINE simulation REFUSED:') "$Label: refused incorrectly: $err"
+    Assert ($err -match '^P-04D OFFLINE simulation REFUSED:') "${Label}: refused incorrectly: $err"
     Write-Host "PASS (fail closed): $Label"
 }
 try {
