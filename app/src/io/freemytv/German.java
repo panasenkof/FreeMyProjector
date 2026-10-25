@@ -11,6 +11,7 @@ final class German {
             case "Settings": return "Einstellungen";
             case "Home Settings": return "Start-Einstellungen";
             case "TV Settings": return "TV-Einstellungen";
+            case "Remote & Bluetooth": return "Fernbedienung und Bluetooth";
             case "HDMI Inputs": return "HDMI-Eingänge";
             case "Inputs": return "Eingänge";
             case "Shortcuts": return "Verknüpfungen";
