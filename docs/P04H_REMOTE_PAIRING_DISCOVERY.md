@@ -4,7 +4,7 @@
 
 **Принятый отчёт владельца 25.10.2026:** `status=candidates-found-not-validated`, `user=0`, firmware verified, обе выборки `android.settings.BLUETOOTH_SETTINGS` пусты, кандидаты: `AddAccessoryActivity`, `BluetoothDevicePickerActivity`, `BluetoothPairingDialog`, `BluetoothPairingRequest`, `BluetoothRequestPermissionActivity`, `FMBlePairingDialog`, `BluetoothSpeakerMode`, `DeviceNameSettingsActivity`. `device_writes=0`, HOME blocked. **Диалоги и BluetoothSpeakerMode не открывать напрямую**.
 
-**Точная OEM Activity на MiProjM05/.4185 пока не известна**. Скрипт читает package resolver и три заводских пакета без запуска Activity, изменений Bluetooth, HOME или файлов.
+**Назначение компонента установлено по AOSP; его внешняя доступность на OEM `.4185` пока не подтверждена.** Скрипт собирает кандидатов без запуска Activity, изменений Bluetooth, HOME или файлов.
 
 ## Команда после обновления main
 
@@ -29,7 +29,7 @@ $folder = "D:\Git\FreeMyProjector\MiProjM05-baseline-20261025-091132-80cc72ea6d"
 
 ## Что уже есть в APK
 
-В `SettingsActivity` добавлена отдельная ручная строка «Пульт и Bluetooth». По нажатию `ProjectorRemoteSettings` пытается открыть `Settings.ACTION_BLUETOOTH_SETTINGS` только через разрешённый, exported OEM Activity без дополнительного permission. В случае отсутствия — открывает `Settings.ACTION_SETTINGS`. Этот fallback **не обязательно экран сопряжения**, но сохраняет доступ к заводским настройкам.
+В `SettingsActivity` есть строка «Пульт и Bluetooth». Текущая реализация сначала проверяет адресный OEM `AddAccessoryActivity`, а при отказе — стандартный Bluetooth Intent и общие настройки; эта последняя ступень не обязательно открывает сопряжение.
 
 Автоматического открытия pairing, перепривязки пульта или запуска через boot нет. USB-клавиатура исключена из планов резервного ввода по желанию владельца.
 
