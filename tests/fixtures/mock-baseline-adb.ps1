@@ -73,22 +73,7 @@ if ($cmd -eq 'shell cmd package query-activities --brief -a android.settings.BLU
     if ($case -eq 'pairing-none') { 'No activities found'; return }
     'com.android.tv.settings/.bluetooth.BluetoothSettingsActivity'; return
 }
-if ($cmd -match '^shell dumpsys package (com\.android\.tv\.settings|com\.fengmi\.fmsettings|com\.formovie\.gsettings)
-    $all | ForEach-Object { "package:$_" }
-    return
-}
-if ($cmd -in @('shell pm list packages -d','shell pm list packages -d --user 0')) {
-    $off | ForEach-Object { "package:$_" }
-    return
-}
-if ($cmd -in @('shell pm list packages -e','shell pm list packages -e --user 0')) {
-    $all | Where-Object { $_ -notin $off } | ForEach-Object { "package:$_" }
-    if ($case -eq 'inconsistent') { "package:$($off[0])" }
-    if ($case -eq 'malformed') { 'package:private-serial-123@192.168.1.25' }
-    return
-}
-throw 'Unexpected ADB arguments'
-) {
+if ($cmd -match '^shell dumpsys package (com\.android\.tv\.settings|com\.fengmi\.fmsettings|com\.formovie\.gsettings)$') {
     if ($case -eq 'pairing-none') { 'Nothing exported'; return }
     if ($Matches[1] -eq 'com.android.tv.settings') {
         'Activity Resolver Table:'
