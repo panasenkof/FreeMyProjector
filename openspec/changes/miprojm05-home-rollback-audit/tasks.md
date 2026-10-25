@@ -23,7 +23,8 @@
 - [ ] Owner to execute safe [P-04C manual checklist](../../../docs/P04C_REMOTE_PICTURE_MANUAL_CHECKLIST.md): remote/gear/voice/long-press, original picture/focus/keystone/HDMI and alternative control. Do NOT unpair/reset/recalibrate yet.
 - [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
-- [ ] Simulate Android 9 rollback of original HOME and per-package enabled/disabled states on mocks; verify failure paths and absence of dangerous fallback.
+- [x] Add P-04D offline-only mock simulator for Android 9 HOME and package rollback based on SHA-verified baseline + explicit change journal (failure injection; idempotency; protected packages). CI must verify; no device write implementation exists.
+- [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
 - [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
 
 - [ ] Check exported flags, alias targets, permissions and safe entry routes without mutation; HDMI/optical functional behavior remains untested.

@@ -1,4 +1,4 @@
-name: P-01/P-04B read-only ADB snapshot and comparison tests
+name: P-01/P-04 safe Android 9 diagnostics and offline rollback tests
 
 on:
   pull_request:
@@ -6,9 +6,11 @@ on:
       - "tools/read-only-device-info.ps1"
       - "tools/Save-ProjectorBaseline.ps1"
       - "tools/Compare-ProjectorBaseline.ps1"
+      - "tools/Invoke-ProjectorRollbackSimulation.ps1"
       - "tests/Test-ReadOnlyDeviceInfo.ps1"
       - "tests/Test-ProjectorBaseline.ps1"
       - "tests/Test-ProjectorBaselineComparison.ps1"
+      - "tests/Test-ProjectorRollbackSimulation.ps1"
       - "tests/fixtures/mock-adb.ps1"
       - "tests/fixtures/mock-baseline-adb.ps1"
       - ".github/workflows/device-audit-tests.yml"
@@ -17,6 +19,8 @@ on:
     paths:
       - "tools/read-only-device-info.ps1"
       - "tools/Save-ProjectorBaseline.ps1"
+      - "tools/Compare-ProjectorBaseline.ps1"
+      - "tools/Invoke-ProjectorRollbackSimulation.ps1"
       - "tests/**"
       - ".github/workflows/device-audit-tests.yml"
   workflow_dispatch:
@@ -37,3 +41,4 @@ jobs:
           .\tests\Test-ReadOnlyDeviceInfo.ps1
           .\tests\Test-ProjectorBaseline.ps1
           .\tests\Test-ProjectorBaselineComparison.ps1
+          .\tests\Test-ProjectorRollbackSimulation.ps1
