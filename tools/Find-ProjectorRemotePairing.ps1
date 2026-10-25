@@ -40,7 +40,7 @@ function Candidates($Text) {
             if ((Valid-Component $name) -and $set.Count -lt 50) { [void]$set.Add($name) }
         }
     }
-    return ,$set
+    return @($set | Sort-Object)
 }
 $verifier=Join-Path $PSScriptRoot 'Compare-ProjectorBaseline.ps1'
 if (-not (Test-Path -LiteralPath $verifier -PathType Leaf)) {Stop-Pairing 'Baseline verifier missing'}
@@ -55,7 +55,7 @@ if([IO.Path]::IsPathRooted($AdbPath) -and (Test-Path -LiteralPath $AdbPath -Path
     if($null -eq $ex -or $ex.CommandType -notin @('Application','ExternalScript')) {Stop-Pairing 'ADB unavailable'}
     $script:AdbExecutable=$ex.Source
 }
-$devices=Call-Adb @('devices')
+$devices=Call-Adb -A @('devices')
 $found=@($devices -split '\r?\n' | Where-Object { $_ -match '^\s*\S+\s+(device|offline|unauthorized|recovery|sideload|bootloader)(?:\s|$)' })
 if ($found.Count -ne 1 -or $found[0] -notmatch '\sdevice\s*$') {Stop-Pairing 'Exactly one authorized projector required'}
 $required=[ordered]@{
@@ -66,20 +66,20 @@ $required=[ordered]@{
     'ro.build.display.id'='PQ3B.190705.003.4185'
 }
 foreach($k in $required.Keys) {
-    $p=Call-Adb @('shell','getprop',$k)
+    $p=Call-Adb -A @('shell','getprop',$k)
     if($p -cne $required[$k]) {Stop-Pairing 'Firmware differs from audited projector'}
 }
-$user=Call-Adb @('shell','am','get-current-user')
+$user=Call-Adb -A @('shell','am','get-current-user')
 if($user -cne '0') {Stop-Pairing 'Android user is not 0'}
 $standardAction='android.settings.BLUETOOTH_SETTINGS'
-$resolved=Call-Adb @('shell','cmd','package','resolve-activity','--brief','-a',$standardAction) -AllowEmpty
+$resolved=Call-Adb -A @('shell','cmd','package','resolve-activity','--brief','-a',$standardAction) -AllowEmpty
 $standard=@(Candidates $resolved | Sort-Object)
 # This query is read-only; a failure is conservatively treated as unresolved.
-$listed=Call-Adb @('shell','cmd','package','query-activities','--brief','-a',$standardAction) -AllowEmpty
+$listed=Call-Adb -A @('shell','cmd','package','query-activities','--brief','-a',$standardAction) -AllowEmpty
 $queried=@(Candidates $listed | Sort-Object)
 $oem=New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
 foreach($pkg in @('com.android.tv.settings','com.fengmi.fmsettings','com.formovie.gsettings')) {
-    $dump=Call-Adb @('shell','dumpsys','package',$pkg) -AllowEmpty
+    $dump=Call-Adb -A @('shell','dumpsys','package',$pkg) -AllowEmpty
     foreach($name in (Candidates $dump)) {
         if ($name -match '(?i)(bluetooth|accessor|remote|pair|device.*settings)') { [void]$oem.Add($name) }
     }
