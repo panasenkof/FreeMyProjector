@@ -12,6 +12,8 @@ final class Spanish {
             case "Home Settings": return "Ajustes de inicio";
             case "TV Settings": return "Ajustes del TV";
             case "Projector features": return "Funciones del proyector";
+            case "Optics settings": return "Ajustes ópticos";
+            case "Power settings": return "Ajustes de energía";
             case "Automatic keystone": return "Corrección trapezoidal automática";
             case "Keystone calibration": return "Calibración trapezoidal";
             case "HDMI zoom": return "Zoom HDMI";
