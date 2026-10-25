@@ -1,6 +1,6 @@
 > **FreeMyProjector — independent Xiaomi projector adaptation (work in progress).**
 > This repository is based on Free My TV (MIT license). Compatibility with Xiaomi Mi Smart Compact Projector has **not** been verified on hardware yet.
-> **Russian project roadmap:** [PLAN.md](PLAN.md) · [SDD process](docs/SDD_GUIDE.md) · [Hardware notes](docs/PROJECTOR_COMPATIBILITY.md) · [Private signed APK setup](docs/RELEASE_SIGNING.md).
+> **Russian project roadmap:** [PLAN.md](PLAN.md) · [SDD process](docs/SDD_GUIDE.md) · [Hardware notes](docs/PROJECTOR_COMPATIBILITY.md) · [Research & factory/current menu index](docs/MIPROJM05_RESEARCH_INDEX.md) · [Private signed APK setup](docs/RELEASE_SIGNING.md).
 > **Current Android package ID (P-03): `com.fader.freemyprojector`.** This changes the *installed app identity*, not the GitHub repository owner or the Java source namespace (`io.freemytv`).
 > The original upstream README follows; its Android installation commands (including `FreeMyTV.apk` and `io.freemytv`), ADB changes and HOME-switch instructions are **obsolete for FreeMyProjector and not validated for Xiaomi**. Use [release signing](docs/RELEASE_SIGNING.md) and the [safety roadmap](PLAN.md) instead. Do not change HOME before P-04.
 

@@ -99,6 +99,7 @@
 | Пошаговое объяснение SDD, команды, критерии ревью | `docs/SDD_GUIDE.md` |
 | Правила для любых AI-агентов, включая ChatGPT/Claude/Codex | `AGENTS.md` |
 | Происхождение кода и юридические сведения | `UPSTREAM.md`, `LICENSE` |
+| Единый каталог исследований, ссылок на Xiaomi/обзоры и фактически подтверждённых пунктов заводского меню / текущего меню приложения | [`docs/MIPROJM05_RESEARCH_INDEX.md`](docs/MIPROJM05_RESEARCH_INDEX.md) |
 | Детали модели, аппаратных ограничений и проверок | `docs/PROJECTOR_COMPATIBILITY.md` |
 | Активные изменения «что хотим / как сделаем / проверки» | `openspec/changes/<change-name>/` |
 | Подтверждённое поведение уже реализованных функций | `openspec/specs/<capability>/spec.md` |
