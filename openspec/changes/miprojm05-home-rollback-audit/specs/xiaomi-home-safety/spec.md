@@ -92,6 +92,26 @@ The system SHALL preserve factory remote pairing/re-pairing, remote keys and ori
 - **WHEN** testing a new launcher or native-settings entry point
 - **THEN** preserve access to OEM 'Изображение' and record original picture mode and all actually present picture controls without inventing firmware values; do not assume the camera-brightness setting is projector-lamp brightness.
 
+### Requirement: Read-only baseline helper is strictly device-scoped
+
+The owner-facing snapshot tool SHALL collect the original HOME, all installed/enabled/disabled package names and build provenance using only read-only ADB operations; SHALL NOT change system state or save device-identifying serial/IP fields; and SHALL refuse incomplete or contradictory data.
+
+#### Scenario: Audited projector baseline
+- **WHEN** exactly one authorized MiProjM05/eva with Android 9 API 28 and build `PQ3B.190705.003.4185` reports the original HOME and consistent package inventories
+- **THEN** save a new never-overwritten local JSON record outside the repository and a SHA256 checksum, while explaining that this is not firmware/data/calibration backup.
+
+#### Scenario: Incomplete evidence
+- **WHEN** device authorization, exact build, factory HOME, HOME claimant query or the installed/enabled/disabled partition is missing, ambiguous or inconsistent
+- **THEN** fail closed without writing a partial snapshot or executing system-changing ADB commands.
+
+#### Scenario: Preserving originally disabled packages
+- **WHEN** the device reports an existing disabled package
+- **THEN** the baseline SHALL record it as originally disabled instead of treating all packages as enabled.
+
+#### Scenario: Backup output path within repository
+- **WHEN** an output location is inside the source tree
+- **THEN** reject it before contacting ADB, to avoid accidentally committing per-device inventories.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 

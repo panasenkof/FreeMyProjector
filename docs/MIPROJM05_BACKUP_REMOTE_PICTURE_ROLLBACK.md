@@ -21,6 +21,24 @@
 
 ## 2. Резервная копия: различать снимок состояния и прошивку
 
+### P-04B: инструмент read-only snapshot для Windows (реализован, железо не проверено)
+
+Файл: [tools/Save-ProjectorBaseline.ps1](../tools/Save-ProjectorBaseline.ps1). **Это только снимок HOME/установленных и disabled-пакетов, а не прошивка, Bluetooth backup или резервная копия настроек изображения.** До последующего согласования запрещено менять HOME и пакеты.
+
+Скрипт требует **ровно одно авторизованное ADB-подключение**, точную модель `MiProjM05/eva`, Android 9/API28, build `PQ3B.190705.003.4185`, исходный HOME `com.google.android.tvlauncher/.MainActivity`, возможность прочитать `cmd package query-activities` и согласованность `pm list packages`, `-e` и `-d`. Если хотя бы одно условие не выполнено, копия не создаётся. Пакеты Fengmi/Formovie/Droidlogic/Camera2 проверяются на присутствие и enabled-state. Неподдерживаемый firmware — не повод «продолжать любой ценой».
+
+В PowerShell **после CI, если потребуется локальный snapshot**, из каталога проекта (действия на устройстве только для чтения):
+
+```powershell
+$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
+# Если ваш $adb уже настроен в текущем терминале, оставьте свой путь.
+.\tools\Save-ProjectorBaseline.ps1 -AdbPath $adb -OutputDirectory "$env:USERPROFILE\Documents"
+```
+
+Папка вида `MiProjM05-baseline-ГГГГММДД-ЧЧММСС-*` создаётся **вне репозитория**, только после успешной полной диагностики. В ней локальный `baseline.private.json` с **полным списком пакетов** и SHA256SUMS.txt; не отправлять файлы в GitHub/чат. Системных изменений нет, root не нужен. Скрипт не обновляет предыдущий снимок, каждый запуск создаёт новую папку. Состояния отдельных Activity не сохраняются; это не гарантия абсолютного восстановления. При ошибке передать только сообщение ошибки (без приватного вывода ADB), не применять параметры обхода безопасности.
+
+Оффлайн проверка: `tests/Test-ProjectorBaseline.ps1` (fake ADB) и `.github/workflows/device-audit-tests.yml`; реальные команды на железе до передачи отчёта владельцем **не проверены**.
+
 ### A. Обязательный доступный без root снимок ДО первого изменения
 Создать на ПК пользователя отдельный **read-only** инструмент P-04 для локального архива с датой и SHA-256, который сохраняет:
 1. Точные model/device/build/SDK; фактически resolved HOME и список HOME claimants, исходный `com.google.android.tvlauncher/.MainActivity`.
