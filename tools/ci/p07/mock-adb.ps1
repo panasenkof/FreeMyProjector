@@ -36,7 +36,7 @@ if ($key -eq 'shell cmd package resolve-activity --brief -a android.intent.actio
     exit 0
 }
 if ($key -match '^shell pm list packages(?: (.*))?$') {
-    $flags = $Matches[1]
+    $flags = if ($Matches.ContainsKey(1)) { [string]$Matches[1] } else { '' }
     if ($flags -eq '-d' -or $flags -eq '-d --user 0') { exit 0 }
     if ($flags -notin @('','-e','--user 0','-e --user 0')) { exit 2 }
     foreach ($p in $packages) {
