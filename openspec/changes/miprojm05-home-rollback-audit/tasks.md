@@ -24,6 +24,8 @@
 - [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
 - [x] Add P-04D offline-only mock simulator for Android 9 HOME and package rollback based on SHA-verified baseline + explicit change journal (failure injection; idempotency; protected packages). CI must verify; no device write implementation exists.
+- [x] Add one-command local Windows offline mock-rollback runner using owner's SHA-verified baseline without ADB/Android writes, plus temp-fixture cleanup and mocked CI coverage; owner-side execution remains pending.
+- [ ] Owner to run `tools/Test-ProjectorRollbackLocally.ps1` against the saved 114-package baseline and report only redacted console summary.
 - [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
 - [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
 

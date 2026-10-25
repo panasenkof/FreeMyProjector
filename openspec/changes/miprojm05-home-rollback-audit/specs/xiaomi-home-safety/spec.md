@@ -151,6 +151,18 @@ An offline simulator SHALL calculate and verify a **hypothetical** Android 9 res
 - **WHEN** the mock state has unjournalled state changes, missing baseline package, protected service modification, FallbackHome, wrong firmware, corrupt SHA or an injected step failure
 - **THEN** fail closed or flag mock failure; never issue device commands or claim physical recovery was tested.
 
+### Requirement: One-command offline owner-baseline rollback dry-run
+
+The owner SHALL be able to run a mock-only restoration exercise on Windows PowerShell 5.1 using their verified, local P-04B snapshot. The runner SHALL NOT accept ADB or invoke any Android mutation, SHALL NOT modify the baseline, and SHALL remove temporary synthetic scenarios from the parent project workspace when complete.
+
+#### Scenario: Valid owner baseline
+- **WHEN** a valid SHA256-verified P-04B snapshot is supplied on the owner's computer
+- **THEN** simulate initial/no-op, hypothetical HOME change and restoration, and intentional failure injection without any projector access; also simulate a journalled package state change if one of the constrained test-only candidates occurs in the baseline.
+
+#### Scenario: Invalid local baseline or interruption
+- **WHEN** the checksum fails or simulated restoration faults are injected
+- **THEN** reject invalid data before preparing test scenarios, and report expected mock failures with `device_access=none`, `device_writes=0`, `home_switch_blocked=true` without touching the projector or original snapshot.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 
