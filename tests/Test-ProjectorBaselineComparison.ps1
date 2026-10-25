@@ -92,7 +92,8 @@ try {
     Assert ($missing.packages.absent_from_device[0] -eq 'com.example.otherapp') 'Wrong missing package'
 
     foreach($bad in @('unauthorized','multiple','current-wrong-firmware','current-fallback-home',
-        'protected-disabled','missing-claimant','query-error','inconsistent','malformed')) {
+        'protected-disabled','missing-claimant','query-error','inconsistent','malformed',
+        'current-home-chooser')) {
         [void](Invoke-Case $bad $false)
     }
 
