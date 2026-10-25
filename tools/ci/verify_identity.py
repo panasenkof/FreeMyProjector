@@ -114,7 +114,7 @@ def verify() -> tuple[str, int]:
     # P-04H: factory Bluetooth entry must be a user-triggered, runtime-gated
     # OEM activity. These static checks complement (not replace) physical testing.
     pairing = (ROOT / "app/src/io/freemytv/ProjectorRemoteSettings.java").read_text(encoding="utf-8")
-    pairing_without_comments = re.sub(r"/\\*.*?\\*/|//[^\\n]*", "", pairing, flags=re.DOTALL)
+    pairing_without_comments = re.sub(r"/\*.*?\*/|//[^\n]*", "", pairing, flags=re.DOTALL)
     for required in (
         '"com.android.tv.settings.accessories.AddAccessoryActivity"',
         '"com.google.android.intent.action.CONNECT_INPUT"',
