@@ -2,7 +2,9 @@ name: P-07 PowerShell probe safety
 on:
   pull_request:
     paths:
-      - 'tools/Measure-ProjectorMemoryReadOnly.ps1'\n      - 'tools/ProjectorMemoryParsers.ps1'\n      - 'tools/ci/p07/**'
+      - 'tools/Measure-ProjectorMemoryReadOnly.ps1'
+      - 'tools/ProjectorMemoryParsers.ps1'
+      - 'tools/ci/p07/**'
       - 'tools/ci/test_p07_readonly_probe.py'
       - '.github/workflows/p07-readonly-probe.yml'
   workflow_dispatch:
@@ -27,7 +29,10 @@ jobs:
             $errors | ForEach-Object { Write-Error $_.Message }
             exit 1
           }
-      - name: Execute offline memory parser regressions\n        shell: powershell\n        run: .\\tools\\ci\\p07\\Test-ProjectorMemoryParsers.ps1\n      - name: Run read-only static regression tests
+      - name: Execute offline memory parser regressions
+        shell: powershell
+        run: .\\tools\\ci\\p07\\Test-ProjectorMemoryParsers.ps1
+      - name: Run read-only static regression tests
         shell: pwsh
         run: python -m unittest discover -s tools/ci -p "test_p07_readonly_probe.py" -v
       - name: Fail closed on missing snapshot (mock failure)
