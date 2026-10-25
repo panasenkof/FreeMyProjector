@@ -111,6 +111,38 @@ def verify() -> tuple[str, int]:
         "OEM bridge must never start an OEM Activity"
     )
 
+    # P-04H: factory Bluetooth entry must be a user-triggered, runtime-gated
+    # OEM activity. These static checks complement (not replace) physical testing.
+    pairing = (ROOT / "app/src/io/freemytv/ProjectorRemoteSettings.java").read_text(encoding="utf-8")
+    pairing_without_comments = re.sub(r"/\*.*?\*/|//[^\n]*", "", pairing, flags=re.DOTALL)
+    for required in (
+        '"com.android.tv.settings.accessories.AddAccessoryActivity"',
+        '"com.google.android.intent.action.CONNECT_INPUT"',
+        'Build.VERSION.SDK_INT == 28',
+        '"MiProjM05".equals(Build.MODEL)',
+        '"eva".equals(Build.DEVICE)',
+        '"PQ3B.190705.003.4185".equals(Build.DISPLAY)',
+        'pm.getActivityInfo(target, 0)',
+        'info.exported', 'info.enabled', 'info.permission',
+        'ApplicationInfo.FLAG_SYSTEM', 'ApplicationInfo.FLAG_UPDATED_SYSTEM_APP',
+        'intent.setComponent(target)',
+        'static void openFromUserTap(Activity activity)',
+        'Settings.ACTION_BLUETOOTH_SETTINGS', 'Settings.ACTION_SETTINGS',
+    ):
+        assert required in pairing_without_comments, f"Missing OEM pairing preflight: {required}"
+    for forbidden in (
+        'BluetoothPairingDialog', 'BluetoothDevicePickerActivity',
+        'FMBlePairingDialog', 'BluetoothPairingRequest',
+        'createBond(', 'removeBond(', 'setHome', 'set-home-activity',
+        'Runtime.getRuntime(', 'ProcessBuilder', 'am start', 'settings put',
+        'no_input_mode', 'startDiscovery(', 'ACTION_PAIRING_REQUEST',
+    ):
+        assert forbidden not in pairing_without_comments, f"Unsafe pairing bridge action: {forbidden}"
+    settings_ui = (ROOT / "app/src/io/freemytv/SettingsActivity.java").read_text(encoding="utf-8")
+    assert settings_ui.count("ProjectorRemoteSettings.openFromUserTap(activity);") == 1, (
+        "Remote entry point must only be invoked from the settings OK handler"
+    )
+
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"

@@ -1,6 +1,10 @@
 # P-04H — безопасное обнаружение заводского экрана сопряжения
 
-**Точная OEM Activity на MiProjM05/.4185 пока не известна**. Скрипт читает package resolver и три заводских пакета без запуска Activity, изменений Bluetooth, HOME или файлов.
+**Найден наиболее вероятный заводской экран:** `com.android.tv.settings/.accessories.AddAccessoryActivity` на реальном MiProjM05/eva Android9 build `.4185`. В AOSP Android TV эта Activity прямо предназначена для поиска и сопряжения Bluetooth-устройств и обычно экспортируется для действия `com.google.android.intent.action.CONNECT_INPUT`: [AOSP исходный класс](https://android.googlesource.com/platform/packages/apps/TvSettings/+/293380a/Settings/src/com/android/tv/settings/accessories/AddAccessoryActivity.java), [AOSP Manifest](https://android.googlesource.com/platform/packages/apps/TvSettings/+/29e0208/Settings/AndroidManifest.xml). **На прошивке владельца экспортируемость, permission и реальный запуск пока не испытаны**. Поэтому это обоснованный адресный кандидат, а не доказанная работоспособность.
+
+**Принятый отчёт владельца 25.10.2026:** `status=candidates-found-not-validated`, `user=0`, firmware verified, обе выборки `android.settings.BLUETOOTH_SETTINGS` пусты, кандидаты: `AddAccessoryActivity`, `BluetoothDevicePickerActivity`, `BluetoothPairingDialog`, `BluetoothPairingRequest`, `BluetoothRequestPermissionActivity`, `FMBlePairingDialog`, `BluetoothSpeakerMode`, `DeviceNameSettingsActivity`. `device_writes=0`, HOME blocked. **Диалоги и BluetoothSpeakerMode не открывать напрямую**.
+
+**Назначение компонента установлено по AOSP; его внешняя доступность на OEM `.4185` пока не подтверждена.** Скрипт собирает кандидатов без запуска Activity, изменений Bluetooth, HOME или файлов.
 
 ## Команда после обновления main
 
@@ -15,9 +19,17 @@ $folder = "D:\Git\FreeMyProjector\MiProjM05-baseline-20261025-091132-80cc72ea6d"
 
 **Важно:** `oem_pairing_activity_candidates` — только кандидаты по имени, не подтверждение exported/permissions или успешного запуска. После получения результата нужен анализ конкретных Activity, только затем проверка открытия штатного экрана из обычного APK.
 
+## Реализовано после этого отчёта
+
+В ручной кнопке «Пульт и Bluetooth» теперь сначала используется **явный компонент** `AddAccessoryActivity`, но исключительно на `MiProjM05/eva` Android 9 с display build `.4185`, и только после runtime `PackageManager.getActivityInfo` с условиями `exported`, `enabled`, `permission` отсутствует, OEM/system package, точное имя Activity. Intent использует AOSP action `CONNECT_INPUT`, без дополнительных флагов автоматического pairing.
+
+При ошибке открытия, недоступности или другой прошивке остаются проверка обычного Bluetooth Settings Intent (в отчёте не разрешился) и переход в общие заводские Settings. Вызов не происходит автоматически при запуске или загрузке. **Открытие страницы штатного сопряжения по явному нажатию** может инициировать обнаружение Bluetooth-устройств самим заводским экраном; оно не удаляет существующую пару по нашей команде.
+
+До готового подписанного APK и отдельного пользовательского аппаратного теста мы **не можем** отметить `vendor_activity_launch_verified=true`.
+
 ## Что уже есть в APK
 
-В `SettingsActivity` добавлена отдельная ручная строка «Пульт и Bluetooth». По нажатию `ProjectorRemoteSettings` пытается открыть `Settings.ACTION_BLUETOOTH_SETTINGS` только через разрешённый, exported OEM Activity без дополнительного permission. В случае отсутствия — открывает `Settings.ACTION_SETTINGS`. Этот fallback **не обязательно экран сопряжения**, но сохраняет доступ к заводским настройкам.
+В `SettingsActivity` есть строка «Пульт и Bluetooth». Текущая реализация сначала проверяет адресный OEM `AddAccessoryActivity`, а при отказе — стандартный Bluetooth Intent и общие настройки; эта последняя ступень не обязательно открывает сопряжение.
 
 Автоматического открытия pairing, перепривязки пульта или запуска через boot нет. USB-клавиатура исключена из планов резервного ввода по желанию владельца.
 
