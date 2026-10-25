@@ -56,7 +56,7 @@ Set-Clipboard -Value ""
 2. Выбери **Publish signed FreeMyProjector APK (manual)**.
 3. Нажми **Run workflow**, выбери ветку **main**.
 4. Запуск проверит package ID, текущую версию из AndroidManifest (для P-05 `0.1.1` и `versionCode=1001`), наличие тех же секретов, подпишет APK личным ключом и проверит подпись и preview-only manifest.
-5. В случае успеха появится новый **prerelease `v0.1.0`** в [GitHub Releases](https://github.com/panasenkof/FreeMyProjector/releases) с файлами `FreeMyProjector-v0.1.0.apk`, `SHA256SUMS.txt`, `BUILD-REPORT.txt`.
+5. В случае успеха появится новый **prerelease `v0.1.1`** в [GitHub Releases](https://github.com/panasenkof/FreeMyProjector/releases) с файлами `FreeMyProjector-v0.1.1.apk`, `SHA256SUMS.txt`, `BUILD-REPORT.txt`. `v0.1.0` сохраняется как исторический первый релиз.
 6. **Только этот подписанный APK** рассчитан на установку; неподписанные CI-артефакты для этого не подходят.
 
 Если секретов нет/они неверны, релиз должен завершиться **ошибкой без публикации**. Попроси проверить название недостающего секрета, но не присылай его значение.
