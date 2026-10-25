@@ -116,6 +116,26 @@ The owner-facing snapshot tool SHALL collect the original HOME, all installed/en
 - **WHEN** an output location is inside the source tree
 - **THEN** reject it before contacting ADB, to avoid accidentally committing per-device inventories.
 
+### Requirement: Compare baseline with projector without performing rollback
+
+The owner SHALL be able to validate a saved P-04B snapshot offline and review current HOME/package differences without any device write, file output, firmware operation or claim that HOME rollback is safe.
+
+#### Scenario: Verify before ADB
+- **WHEN** the owner requests snapshot verification only
+- **THEN** SHA256 and required device metadata SHALL be validated entirely offline, with no ADB command and no saved-file mutation.
+
+#### Scenario: Check current configuration
+- **WHEN** the saved snapshot is valid and exactly one authorized projector is present with matching MiProjM05/eva Android 9 build
+- **THEN** report current HOME and installed/enabled/disabled package differences, or `matches-baseline`, using read-only commands and displaying non-executable review actions.
+
+#### Scenario: Snapshot tampering or unsupported firmware
+- **WHEN** SHA256 mismatches, snapshot structure is malformed, firmware differs or required factory components are missing or disabled
+- **THEN** refuse to produce a restoration preview and never attempt to modify the device.
+
+#### Scenario: Changed package states
+- **WHEN** a package was disabled in the snapshot and is enabled now
+- **THEN** report the original disabled state for separate review; never automatically enable or disable packages, delete added packages or treat `FallbackHome` as working HOME.
+
 ### Requirement: Default-deny HOME mutation
 The existing source-level safety gate MUST remain closed until a separately approved, firmware-tested rollback protocol exists.
 
