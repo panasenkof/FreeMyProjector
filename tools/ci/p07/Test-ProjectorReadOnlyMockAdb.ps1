@@ -34,6 +34,15 @@ try {
         (New-Object System.Text.UTF8Encoding($false)))
 
     $env:P07_MOCK_CASE = ''
+    # Fail with a sanitized, actionable P-04E error instead of hiding every
+    # unexpected fake-ADB command under the outer P-07 preflight message.
+    $preflight = Join-Path $root 'tools/Test-ProjectorUser0Scope.ps1'
+    try {
+        $scope = (& $preflight -SnapshotDirectory $temp -AdbPath $mock) | ConvertFrom-Json
+        if ($scope.status -cne 'user0-matches-baseline') { throw 'Synthetic scope mismatch' }
+    } catch {
+        throw ('Mock P-04E preflight: ' + $_.Exception.Message)
+    }
     $result = (& $probe -SnapshotDirectory $temp -AdbPath $mock -Phase stock-before) | ConvertFrom-Json
     if ($result.status -cne 'read-only-sample' -or $result.mem_total_kib -ne 2048000 -or
         $result.mem_available_kib -ne 512000 -or $result.device_writes -ne 0 -or
