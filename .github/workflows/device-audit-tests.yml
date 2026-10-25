@@ -7,10 +7,12 @@ on:
       - "tools/Save-ProjectorBaseline.ps1"
       - "tools/Compare-ProjectorBaseline.ps1"
       - "tools/Invoke-ProjectorRollbackSimulation.ps1"
+      - "tools/Test-ProjectorRollbackLocally.ps1"
       - "tests/Test-ReadOnlyDeviceInfo.ps1"
       - "tests/Test-ProjectorBaseline.ps1"
       - "tests/Test-ProjectorBaselineComparison.ps1"
       - "tests/Test-ProjectorRollbackSimulation.ps1"
+      - "tests/Test-ProjectorRollbackLocalRunner.ps1"
       - "tests/fixtures/mock-adb.ps1"
       - "tests/fixtures/mock-baseline-adb.ps1"
       - ".github/workflows/device-audit-tests.yml"
@@ -21,6 +23,7 @@ on:
       - "tools/Save-ProjectorBaseline.ps1"
       - "tools/Compare-ProjectorBaseline.ps1"
       - "tools/Invoke-ProjectorRollbackSimulation.ps1"
+      - "tools/Test-ProjectorRollbackLocally.ps1"
       - "tests/**"
       - ".github/workflows/device-audit-tests.yml"
   workflow_dispatch:
@@ -42,3 +45,4 @@ jobs:
           .\tests\Test-ProjectorBaseline.ps1
           .\tests\Test-ProjectorBaselineComparison.ps1
           .\tests\Test-ProjectorRollbackSimulation.ps1
+          .\tests\Test-ProjectorRollbackLocalRunner.ps1
