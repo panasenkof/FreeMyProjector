@@ -11,6 +11,7 @@ final class Spanish {
             case "Settings": return "Ajustes";
             case "Home Settings": return "Ajustes de inicio";
             case "TV Settings": return "Ajustes del TV";
+            case "Remote & Bluetooth": return "Control remoto y Bluetooth";
             case "HDMI Inputs": return "Entradas HDMI";
             case "Inputs": return "Entradas";
             case "Shortcuts": return "Accesos directos";
