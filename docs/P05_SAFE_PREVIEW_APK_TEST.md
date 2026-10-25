@@ -7,6 +7,7 @@
 - Package `com.fader.freemyprojector`, версия `0.1.1` / versionCode 1001; для подписи нужен **тот же ключ**, что и у выпуска `v0.1.0`.
 - AndroidManifest: `SettingsActivity` включена как обычная Android TV программа, `HomeActivity android:enabled="false"` (нет возможности стать HOME из этой сборки), `HomeReceiver android:enabled="false"` (никакого автозапуска), `RemoteKeyService android:enabled="false"` (никакого перехвата клавиш).
 - Дублирующая программная блокировка `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED=false` сохраняется. В этой сборке вкладка «Кнопки пульта» не может реально включить Accessibility service.
+- Прямые OEM экраны **фокусировки и трапеции в первой P-05 версии заблокированы** отдельным `P05_DIRECT_OPTICS_AUDITED=false`: нажатие на соответствующий пункт открывает корень заводских настроек, но не `FocusActivity`/`KeystoneActivity`. Причина — OEM Activity теоретически может запускать мотор/калибровку уже при открытии. Снять блокировку можно лишь после отдельного исследования и согласия.
 - CI проверяет исходный и **скомпилированный** AndroidManifest; установка/удаление проекторного APK в CI не производится.
 - **Не** перепривязывать пульт, не нажимать автокалибровку, не менять HOME, не запускать factory reset/OTA.
 
