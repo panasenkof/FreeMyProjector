@@ -13,6 +13,10 @@ if ($cmd -eq 'devices') {
     'private-serial-123 device'
     return
 }
+if ($cmd -eq 'shell am get-current-user') {
+    if ($case -eq 'scope-other-user') { '10'; return }
+    '0'; return
+}
 $props = @{
     'ro.product.model'='MiProjM05'
     'ro.product.device'='eva'
@@ -31,6 +35,7 @@ if ($cmd -eq 'shell cmd package resolve-activity --brief -a android.intent.actio
     if ($case -eq 'wrong-home') { 'android'; return }
     if ($case -eq 'current-home-other') { 'com.fader.freemyprojector/.PreviewActivity'; return }
     if ($case -eq 'current-fallback-home') { 'com.android.tv.settings/.system.FallbackHome'; return }
+    if ($case -eq 'current-home-chooser') { 'android/com.android.internal.app.ResolverActivity'; return }
     'com.google.android.tvlauncher/.MainActivity'
     return
 }
@@ -56,15 +61,19 @@ $off = @('com.example.otherapp')
 if ($case -eq 'current-removed-app') { $off = @() }
 if ($case -in @('zero-disabled','current-state-changed')) { $off = @() }
 if ($case -eq 'protected-disabled') { $off = @('com.fengmi.projector.imaging') }
-if ($cmd -eq 'shell pm list packages') {
+$user0 = $cmd.EndsWith(' --user 0')
+if ($user0 -and $case -eq 'scope-user0-unsupported') { 'Error: Unknown option: --user'; return }
+if ($user0 -and $case -eq 'scope-user0-diff') { $off = @() }
+if ($user0 -and $case -eq 'scope-user0-protected-disabled') { $off = @('com.fengmi.projector.imaging') }
+if ($cmd -in @('shell pm list packages','shell pm list packages --user 0')) {
     $all | ForEach-Object { "package:$_" }
     return
 }
-if ($cmd -eq 'shell pm list packages -d') {
+if ($cmd -in @('shell pm list packages -d','shell pm list packages -d --user 0')) {
     $off | ForEach-Object { "package:$_" }
     return
 }
-if ($cmd -eq 'shell pm list packages -e') {
+if ($cmd -in @('shell pm list packages -e','shell pm list packages -e --user 0')) {
     $all | Where-Object { $_ -notin $off } | ForEach-Object { "package:$_" }
     if ($case -eq 'inconsistent') { "package:$($off[0])" }
     if ($case -eq 'malformed') { 'package:private-serial-123@192.168.1.25' }
