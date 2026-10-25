@@ -78,10 +78,10 @@ try {
     Assert ($state.packages.changed_state[0].baseline -eq 'disabled') 'Original disabled state lost'
     Assert ($state.packages.changed_state[0].current -eq 'enabled') 'Current state not reported'
 
-    $home=Invoke-Case current-home-other $true
-    Assert ($home.status -eq 'review-required') 'Changed HOME not reported'
-    Assert ($home.home.differs -eq $true) 'HOME difference flag missing'
-    Assert ($home.home.baseline -eq 'com.google.android.tvlauncher/.MainActivity') 'Original HOME changed'
+    $homePreview=Invoke-Case current-home-other $true
+    Assert ($homePreview.status -eq 'review-required') 'Changed HOME not reported'
+    Assert ($homePreview.home.differs -eq $true) 'HOME difference flag missing'
+    Assert ($homePreview.home.baseline -eq 'com.google.android.tvlauncher/.MainActivity') 'Original HOME changed'
 
     $extra=Invoke-Case current-extra-app $true
     Assert ($extra.packages.new_since_baseline.Count -eq 1) 'New app not shown'
