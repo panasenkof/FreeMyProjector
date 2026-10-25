@@ -187,6 +187,8 @@ def verify() -> tuple[str, int]:
         '"Keystone calibration"', '"Camera brightness"', '"HDMI zoom"',
         '"Bluetooth speaker mode"', '"All factory settings"',
         'ProjectorFactoryScreens.inspect(activity, screen)',
+        'P05_DIRECT_OPTICS_AUDITED = false',
+        'if (!P05_DIRECT_OPTICS_AUDITED)',
         'Settings.ACTION_INTERNAL_STORAGE_SETTINGS',
         'Settings.ACTION_CAST_SETTINGS',
         'Settings.ACTION_SOUND_SETTINGS',

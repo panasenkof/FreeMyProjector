@@ -22,6 +22,10 @@ final class ProjectorSettingsNavigator {
     static final int OPTICS = 0, PICTURE = 1, SOURCES = 2,
             SOUND = 3, CONNECTIONS = 4, SYSTEM = 5;
     static final int SECTION_COUNT = 6;
+    // Preview APK P-05: OEM imaging Activity might auto-adjust optics on launch.
+    // Keep the catalog, but do NOT execute direct focus/keystone intents before a
+    // separate audited hardware test and explicit permission.
+    private static final boolean P05_DIRECT_OPTICS_AUDITED = false;
 
     // Index-aligned PT/EN titles. Russian/German/Spanish via Ui.tr translations.
     private static final String[] SECTION_PT = {
@@ -70,7 +74,10 @@ final class ProjectorSettingsNavigator {
 
     static String itemRoute(int section, int item) {
         // Direct routes are identified here; everything else safely returns to OEM settings.
-        if (section == OPTICS && item < 4) return Ui.tr("Tela de fábrica", "Factory screen");
+        if (section == OPTICS && item < 4) {
+            return P05_DIRECT_OPTICS_AUDITED ? Ui.tr("Tela de fábrica", "Factory screen")
+                    : Ui.tr("Menu da TV", "TV settings");
+        }
         if (section == SOURCES && (item == 0 || item == 3)) return Ui.tr("Tela de fábrica", "Factory screen");
         if (section == CONNECTIONS && item == 1) return Ui.tr("Tela de fábrica", "Factory screen");
         if ((section == SOURCES && item > 0)
@@ -149,6 +156,10 @@ final class ProjectorSettingsNavigator {
     }
 
     private static void openOptics(Activity activity, ProjectorFactoryScreens.Screen screen) {
+        if (!P05_DIRECT_OPTICS_AUDITED) {
+            openOEMSettings(activity);
+            return;
+        }
         ProjectorFactoryScreens.Preflight check = ProjectorFactoryScreens.inspect(activity, screen);
         if (check.available && check.preparedIntent != null) {
             try {
