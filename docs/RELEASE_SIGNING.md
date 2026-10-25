@@ -48,13 +48,15 @@ Set-Clipboard -Value ""
 
 ## 4. Запусти сборку установочного APK
 
+**Актуальный безопасный P-05:** текущий подписанный релиз `v0.1.0` уже опубликован; следующий тестовый APK будет **`v0.1.1`** с меню P-06 и отключёнными в AndroidManifest HOME/автозапуском/службой перехвата клавиш. После слияния P-05 нажать [Run workflow](https://github.com/panasenkof/FreeMyProjector/actions/workflows/signed-release.yml) на `main`; он возьмёт **тот же ключ**, создаст prerelease и проверит *бинарный* манифест. [P-05 инструкция и чек-лист](P05_SAFE_PREVIEW_APK_TEST.md). Старый `v0.1.0` не подходит для аппаратной проверки нового меню.
+
 После слияния P-03:
 
 1. Открой [GitHub Actions](https://github.com/panasenkof/FreeMyProjector/actions).
 2. Выбери **Publish signed FreeMyProjector APK (manual)**.
 3. Нажми **Run workflow**, выбери ветку **main**.
-4. Запуск проверит package ID, версию `0.1.0` и `versionCode=1000`, наличие всех секретов, подпишет APK твоим личным ключом и проверит подпись `apksigner verify`.
-5. В случае успеха появится новый **prerelease `v0.1.0`** в [GitHub Releases](https://github.com/panasenkof/FreeMyProjector/releases) с файлами `FreeMyProjector-v0.1.0.apk`, `SHA256SUMS.txt`, `BUILD-REPORT.txt`.
+4. Запуск проверит package ID, текущую версию из AndroidManifest (для P-05 `0.1.1` и `versionCode=1001`), наличие тех же секретов, подпишет APK личным ключом и проверит подпись и preview-only manifest.
+5. В случае успеха появится новый **prerelease `v0.1.1`** в [GitHub Releases](https://github.com/panasenkof/FreeMyProjector/releases) с файлами `FreeMyProjector-v0.1.1.apk`, `SHA256SUMS.txt`, `BUILD-REPORT.txt`. `v0.1.0` сохраняется как исторический первый релиз.
 6. **Только этот подписанный APK** рассчитан на установку; неподписанные CI-артефакты для этого не подходят.
 
 Если секретов нет/они неверны, релиз должен завершиться **ошибкой без публикации**. Попроси проверить название недостающего секрета, но не присылай его значение.
@@ -77,7 +79,7 @@ Set-Clipboard -Value ""
 Подлинность можно проверить локально:
 
 ```powershell
-& "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.0.apk"
+& "$env:LOCALAPPDATA\Android\Sdk\build-tools\34.0.0\apksigner.bat" verify --verbose --print-certs "FreeMyProjector-v0.1.1.apk"
 ```
 
 Это пример для типичного расположения Android SDK в Windows. Если SDK находится в другом каталоге, используй фактический путь к `build-tools\34.0.0\apksigner.bat`.

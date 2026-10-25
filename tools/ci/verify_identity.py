@@ -49,6 +49,39 @@ def verify() -> tuple[str, int]:
             assert label == "FreeMyProjector", f"Unexpected Android label: {label}"
     assert seen == CLASSES, f"Unexpected manifest classes; missing {CLASSES - seen}, extra {seen - CLASSES}"
 
+    # P-05 TRIAL APK: Android itself must not see FreeMyProjector as HOME.
+    # The separate runtime ModeJob guard is not sufficient: a normal APK install
+    # can otherwise expose a second launcher in the platform's HOME chooser.
+    def activity_component(name: str, tag: str):
+        for component in application.findall(tag):
+            if component.attrib.get(ANDROID + "name") == name:
+                return component
+        raise AssertionError(f"Missing P-05 component {name}")
+
+    settings_activity = activity_component("io.freemytv.SettingsActivity", "activity")
+    home_activity = activity_component("io.freemytv.HomeActivity", "activity")
+    key_service = activity_component("io.freemytv.RemoteKeyService", "service")
+    boot_receiver = activity_component("io.freemytv.HomeReceiver", "receiver")
+    assert settings_activity.attrib.get(ANDROID + "enabled", "true") == "true", (
+        "P-05 Settings must remain available as an ordinary launchable APK"
+    )
+    assert home_activity.attrib.get(ANDROID + "enabled") == "false", (
+        "P-05 HOME Activity must be DISABLED in the Android manifest"
+    )
+    assert key_service.attrib.get(ANDROID + "enabled") == "false", (
+        "P-05 must not offer accessibility key interception"
+    )
+    assert boot_receiver.attrib.get(ANDROID + "enabled") == "false", (
+        "P-05 must not run on device boot/update"
+    )
+    assert "android.intent.category.HOME" in ET.tostring(home_activity, encoding="unicode"), (
+        "Keep original launcher descriptor for separately audited future versions"
+    )
+    assert "android.intent.category.LEANBACK_LAUNCHER" in ET.tostring(settings_activity, encoding="unicode"), (
+        "P-05 Settings must be launchable from stock Android TV"
+    )
+
+
     homemode = (ROOT / "app/src/io/freemytv/HomeMode.java").read_text(encoding="utf-8")
     job = (ROOT / "app/src/io/freemytv/ModeJob.java").read_text(encoding="utf-8")
     build = (ROOT / "build.sh").read_text(encoding="utf-8")

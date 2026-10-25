@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fader.freemyprojector"
-    android:versionCode="1000"
-    android:versionName="0.1.0">
+    android:versionCode="1001"
+    android:versionName="0.1.1">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -68,10 +68,15 @@
             </intent-filter>
         </activity>
 
+        <!-- P-05 TEST BUILD: the HOME candidate is deliberately disabled in Android's
+             manifest (not just in Java). A preview APK must not appear in the
+             system's HOME chooser or displace the factory launcher. Re-enable
+             only in a separately approved and audited P-04/P-05 system pilot. -->
         <!-- The home screen. Its own process (:home): if it ever crashes, the safety net in the main process still
              works. It only becomes the TV's home screen in Free My TV mode (cmd package set-home-activity). -->
         <activity
             android:name="io.freemytv.HomeActivity"
+            android:enabled="false"
             android:process=":home"
             android:exported="true"
             android:label="FreeMyProjector"
@@ -123,10 +128,13 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
+        <!-- P-05 TEST BUILD: do not expose accessibility key interception before
+             separate on-device testing/approval. The menu entry is informational. -->
         <!-- The remote's app buttons from inside any app (Settings > Remote Buttons). Its own process: the system waits for it on
              every key, so the home screen must never be able to slow it down. -->
         <service
             android:name="io.freemytv.RemoteKeyService"
+            android:enabled="false"
             android:process=":keys"
             android:exported="true"
             android:label="FreeMyProjector"
@@ -141,6 +149,7 @@
 
         <receiver
             android:name="io.freemytv.HomeReceiver"
+            android:enabled="false"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
