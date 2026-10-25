@@ -247,6 +247,18 @@ def verify() -> tuple[str, int]:
     ):
         assert required in hdmi, f"HDMI handler cannot be verified/fallback missing: {required}"
 
+    # P-06Q: quick actions must navigate to settings, never invoke optics or power commands.
+    for required in (
+        'static final int OPTICS_SETTINGS = 8, POWER_SETTINGS = 9;',
+        'case OPTICS_SETTINGS:', 'case POWER_SETTINGS:',
+        'ProjectorSettingsNavigator.OPTICS, 0',
+        'ProjectorSettingsNavigator.SYSTEM, 0',
+        '"Optics settings"', '"Power settings"',
+    ):
+        assert required in hdmi, f"Missing safe P-06Q shortcut: {required}"
+    for illegal in ('input keyevent 26', 'PowerManager.goToSleep', 'FocusActivity);', 'startAutoFocus('):
+        assert illegal not in hdmi, f"P-06Q must not change power/optics: {illegal}"
+
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
