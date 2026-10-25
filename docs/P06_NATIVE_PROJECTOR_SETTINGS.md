@@ -57,7 +57,7 @@
 
 | Пункты | Куда переходим при OK | Что ещё не доказано |
 | --- | --- | --- |
-| Фокусировка | `ProjectorFactoryScreens.inspect(FOCUS)` → OEM `FocusActivity` | Runtime экспортируемость/запуск на .4185 — не испытаны |
+| Фокусировка | **P-05 preview:** защищённая навигация в основные заводские настройки; прямой `FocusActivity` подготовлен в коде, но заблокирован `P05_DIRECT_OPTICS_AUDITED=false` | Автофокус может запускаться при старте OEM Activity; испытание только отдельно |
 | Коррекция / авто / калибровка | Один заводской экран `KeystoneActivity`, не запуск калибровки | Конкретные вложенные операции выбираются **уже в OEM UI** пользователем |
 | Ориентация, режим изображения, яркость камеры, Bluetooth speaker, голос, сон/питание | Основные настройки `com.formovie.gsettings.ui.activity.MainActivity`, с проверкой OEM/system/exported и точного build | Отдельных подтверждённых deep links нет; fallback в общие Settings |
 | HDMI и HDMI zoom | `com.droidlogic.tvinput.settings.TvSettingsActivity` с runtime проверкой, иначе общие настройки | Не меняем HDMI input/zoom автоматически |
