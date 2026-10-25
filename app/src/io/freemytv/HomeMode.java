@@ -410,12 +410,6 @@ final class HomeMode {
         return components;
     }
 
-    private static void restoreScreensaver(Adb adb, JSONObject s) throws IOException {
-        String saver = safeComponents(s.optString("originalScreensaver", ""));
-        if (saver.isEmpty()) adb.shell("settings delete secure screensaver_components");
-        else adb.shell("settings put secure screensaver_components '" + saver + "'");
-    }
-
     /** The system's default screensaver ("package/service"), or "". */
     private static String defaultDream(Adb adb) throws IOException {
         String d = adb.shell("settings get secure screensaver_default_component").trim();
