@@ -2,6 +2,8 @@
 
 **Статус 25.10.2026:** владелец успешно снял **read-only снимок HOME/состояния 114 пакетов** (отключённых: 0) и переместил его в локальную папку проекта. **Целостность после переноса проверена 25.10.2026** (`sha256=match`, `status=verified`, 114 установленных / 0 отключённых, без ADB и записи на устройство). **Сравнение с живым проектором выполнено 25.10.2026:** `matches-baseline`, `firmware_match=true`, Google TV HOME совпал, 114/114 пакетов без расхождений, `device_writes=0`. Полноценный firmware backup и реальный rollback НЕ выполнены. Xiaomi MiProjM05/eva, Android TV 9 API 28, build `PQ3B.190705.003.4185`. Пока `ModeJob.PROJECTOR_HOME_SWITCH_AUDITED = false`: не меняем HOME, OEM-пакеты, настройки, сопряжение или калибровку.
 
+**P-04E (25.10.2026):** владелец успешно проверил пакеты для Android user 0: `user0-matches-baseline`, 114/114, disabled 0, расхождений 0, изменений на устройстве 0. G0 для [P-04F](P04F_ANDROID9_RECOVERY_GATES.md) подтверждён, но независимый аварийный доступ/реальный откат и проверка оптики отсутствуют.
+
 Следующая стадия: [P-04C — безопасный ручной чек-лист пульта, изображения, фокусировки, трапеции и HDMI](P04C_REMOTE_PICTURE_MANUAL_CHECKLIST.md). Никакого сброса сопряжения, калибровки или HOME.
 
 Связано с [P-04](P04_HOME_SAFETY_AUDIT.md), [P-04A](PROJECTOR_FUNCTIONS.md), [обнаруженными Intent](MIPROJM05_ACTIVITY_DISCOVERY.md) и [CleanYourTV](CLEANYOURTV_MIPROJM05_RESEARCH.md).
