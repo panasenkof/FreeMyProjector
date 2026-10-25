@@ -16,7 +16,9 @@
 - [x] Implement read-only Windows baseline snapshot + fake ADB test cases for exact firmware, packages, HOME, SHA-256 and fail-closed; **hardware snapshot was taken 25.10.2026**.
 - [x] Owner reports `saved` on 25.10.2026: 114 packages, 0 disabled, snapshot moved to D:\Git\FreeMyProjector outside Git checkout; no private JSON committed.
 - [x] Owner compared SHA256 of pulled `FengmiImaging.apk` with live OEM file on 25.10.2026: identical `948b530bbaf1cd7cf1185099422c8cf1a2521ec1bfcfd92b886c2a12456ab0f2` (one APK, not firmware).
-- [ ] Independently verify checksum of baseline JSON after move and storage protection; hardware rollback remains untested; do not call this a full firmware backup.
+- [x] Owner verified SHA256 of moved baseline JSON in local folder with `Compare-ProjectorBaseline.ps1 -VerifyOnly` on 25.10.2026: `status=verified`, `sha256=match`, 114/0, no ADB/no device writes.
+- [ ] Review physical/offline storage protection of snapshot; hardware rollback remains untested; do not call this a full firmware backup.
+- [ ] Run approved read-only baseline-versus-live-device comparison; record only non-sensitive differences, if any.
 - [x] Implement checksum validation and read-only live drift preview with offline fake-ADB scenarios (HOME, packages, corrupt hash, firmware); CI required. This does NOT implement restoration.
 - [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
