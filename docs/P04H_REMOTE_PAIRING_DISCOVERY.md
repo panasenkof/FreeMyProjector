@@ -19,6 +19,14 @@ $folder = "D:\Git\FreeMyProjector\MiProjM05-baseline-20261025-091132-80cc72ea6d"
 
 **Важно:** `oem_pairing_activity_candidates` — только кандидаты по имени, не подтверждение exported/permissions или успешного запуска. После получения результата нужен анализ конкретных Activity, только затем проверка открытия штатного экрана из обычного APK.
 
+## Реализовано после этого отчёта
+
+В ручной кнопке «Пульт и Bluetooth» теперь сначала используется **явный компонент** `AddAccessoryActivity`, но исключительно на `MiProjM05/eva` Android 9 с display build `.4185`, и только после runtime `PackageManager.getActivityInfo` с условиями `exported`, `enabled`, `permission` отсутствует, OEM/system package, точное имя Activity. Intent использует AOSP action `CONNECT_INPUT`, без дополнительных флагов автоматического pairing.
+
+При ошибке открытия, недоступности или другой прошивке остаются проверка обычного Bluetooth Settings Intent (в отчёте не разрешился) и переход в общие заводские Settings. Вызов не происходит автоматически при запуске или загрузке. **Открытие страницы штатного сопряжения по явному нажатию** может инициировать обнаружение Bluetooth-устройств самим заводским экраном; оно не удаляет существующую пару по нашей команде.
+
+До готового подписанного APK и отдельного пользовательского аппаратного теста мы **не можем** отметить `vendor_activity_launch_verified=true`.
+
 ## Что уже есть в APK
 
 В `SettingsActivity` добавлена отдельная ручная строка «Пульт и Bluetooth». По нажатию `ProjectorRemoteSettings` пытается открыть `Settings.ACTION_BLUETOOTH_SETTINGS` только через разрешённый, exported OEM Activity без дополнительного permission. В случае отсутствия — открывает `Settings.ACTION_SETTINGS`. Этот fallback **не обязательно экран сопряжения**, но сохраняет доступ к заводским настройкам.
