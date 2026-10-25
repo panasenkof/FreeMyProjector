@@ -58,6 +58,8 @@ final class HomeApps {
     static final int APP = 0, LIVE_TV = 1, INPUT = 2, ALL_APPS = 3, SETTINGS = 4, ANDROID_SETTINGS = 5;
     /** The "HDMI Inputs" button: opens the bottom drawer on the inputs (the home screen handles it). */
     static final int INPUTS = 7;
+    // P-06Q: user-activated navigation only; never directly move optics or power off.
+    static final int OPTICS_SETTINGS = 8, POWER_SETTINGS = 9;
     /** Image size of each card (16:9; on screen it shows up to ~330 px wide). */
     static final int TILE_W = 384, TILE_H = 216;
 
@@ -218,6 +220,8 @@ final class HomeApps {
         List<Item> items = new ArrayList<>();
         items.add(shortcut(ALL_APPS, "all", Ui.tr("Todos os Apps", "All Apps"), "apps"));
         items.add(shortcut(SETTINGS, "settings", Ui.tr("Ajustes do Início", "Home Settings"), "settings"));
+        items.add(shortcut(OPTICS_SETTINGS, "optics-settings", Ui.tr("Óptica", "Optics settings"), "settings"));
+        items.add(shortcut(POWER_SETTINGS, "power-settings", Ui.tr("Energia", "Power settings"), "tv_settings"));
         items.add(shortcut(ANDROID_SETTINGS, "tv-settings", Ui.tr("Ajustes da TV", "TV Settings"), "tv_settings"));
         return items;
     }
@@ -390,6 +394,18 @@ final class HomeApps {
             case ANDROID_SETTINGS:
                 intent = new Intent(Settings.ACTION_SETTINGS);
                 break;
+            case OPTICS_SETTINGS:
+                // P-05 optics guard: only opens trusted vendor Settings root,
+                // NOT FocusActivity/KeystoneActivity/motor controls.
+                ProjectorSettingsNavigator.openFromUserTap(
+                        a, ProjectorSettingsNavigator.OPTICS, 0);
+                return true;
+            case POWER_SETTINGS:
+                // This opens factory power settings; does NOT issue a sleep or
+                // shutdown command, which must stay under OEM/power-button control.
+                ProjectorSettingsNavigator.openFromUserTap(
+                        a, ProjectorSettingsNavigator.SYSTEM, 0);
+                return true;
             default:
                 return false;
         }

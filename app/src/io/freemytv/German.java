@@ -12,6 +12,8 @@ final class German {
             case "Home Settings": return "Start-Einstellungen";
             case "TV Settings": return "TV-Einstellungen";
             case "Projector features": return "Projektorfunktionen";
+            case "Optics settings": return "Optikeinstellungen";
+            case "Power settings": return "Energieeinstellungen";
             case "Automatic keystone": return "Automatische Trapezkorrektur";
             case "Keystone calibration": return "Trapezkalibrierung";
             case "HDMI zoom": return "HDMI-Zoom";
