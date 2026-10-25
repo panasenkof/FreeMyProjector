@@ -143,6 +143,51 @@ def verify() -> tuple[str, int]:
         "Remote entry point must only be invoked from the settings OK handler"
     )
 
+    # P-06: all confirmed (non-3D) projector settings must remain navigation-only.
+    catalog = (ROOT / "app/src/io/freemytv/ProjectorSettingsNavigator.java").read_text(encoding="utf-8")
+    ui_settings = (ROOT / "app/src/io/freemytv/SettingsActivity.java").read_text(encoding="utf-8")
+    catalog_clean = re.sub(r"/\*.*?\*/|//[^\n]*", "", catalog, flags=re.DOTALL)
+    for required in (
+        "SECTION_COUNT = 6",
+        '"Optics & projection"', '"Picture"', '"Sources & HDMI"', '"Sound"',
+        '"Connections"', '"System"', '"Focus"', '"Automatic keystone"',
+        '"Keystone calibration"', '"Camera brightness"', '"HDMI zoom"',
+        '"Bluetooth speaker mode"', '"All factory settings"',
+        'ProjectorFactoryScreens.inspect(activity, screen)',
+        'Settings.ACTION_INTERNAL_STORAGE_SETTINGS',
+        'Settings.ACTION_CAST_SETTINGS',
+        'Settings.ACTION_SOUND_SETTINGS',
+        'Settings.ACTION_WIFI_SETTINGS',
+        'Settings.ACTION_DEVICE_INFO_SETTINGS',
+        'Settings.ACTION_ACCESSIBILITY_SETTINGS',
+        'Build.VERSION.SDK_INT == 28',
+        '"MiProjM05".equals(Build.MODEL)',
+        '"eva".equals(Build.DEVICE)',
+        '"PQ3B.190705.003.4185".equals(Build.DISPLAY)',
+        'pm.getActivityInfo(component, 0)',
+        'info.exported', 'info.permission',
+        'ApplicationInfo.FLAG_SYSTEM',
+        'ApplicationInfo.FLAG_UPDATED_SYSTEM_APP',
+        'ProjectorRemoteSettings.openFromUserTap(activity)',
+    ):
+        assert required in catalog_clean, f"Missing safe P-06 capability/navigation: {required}"
+    for forbidden in (
+        '"3D"', 'set-home-activity', 'cmd role', 'pm disable', 'settings put',
+        'removeBond(', 'createBond(', 'BluetoothAdapter', 'startDiscovery(',
+        'Runtime.getRuntime(', 'ProcessBuilder(', 'reboot(', 'startCalibration(',
+        'setBrightness(', 'setHdmiInput(', 'System.exit(',
+    ):
+        assert forbidden not in catalog_clean, f"Unsafe P-06 code: {forbidden}"
+    assert 'case MAIN: return 8;' in ui_settings, "Projector menu row count out of sync"
+    assert 'case PROJECTOR_GROUPS: return ProjectorSettingsNavigator.SECTION_COUNT;' in ui_settings
+    assert 'case PROJECTOR_ITEMS: return ProjectorSettingsNavigator.itemCount(projectorGroup);' in ui_settings
+    assert ui_settings.count('ProjectorSettingsNavigator.openFromUserTap(activity, projectorGroup, focus);') == 1
+    assert 'screen = PROJECTOR_GROUPS;' in ui_settings and 'screen = PROJECTOR_ITEMS;' in ui_settings
+    for language in ("Russian", "German", "Spanish"):
+        translations = (ROOT / f"app/src/io/freemytv/{language}.java").read_text(encoding="utf-8")
+        for key in ('Projector features', 'Keystone calibration', 'HDMI zoom', 'All factory settings'):
+            assert f'case "{key}":' in translations, f"Missing {language} catalog translation {key}"
+
     release = (ROOT / ".github/workflows/signed-release.yml").read_text(encoding="utf-8")
     ci = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in release, "Release workflow is not manually triggered"
