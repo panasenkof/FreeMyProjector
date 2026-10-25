@@ -15,7 +15,9 @@
 - [x] Specify mandatory pre-change local backup, remote pairing/re-pairing, picture settings from photos, no-root backup limits, and fail-closed rollback matrix in [P-04B](../../../docs/MIPROJM05_BACKUP_REMOTE_PICTURE_ROLLBACK.md).
 - [x] Implement read-only Windows baseline snapshot + fake ADB test cases for exact firmware, packages, HOME, SHA-256 and fail-closed; **hardware snapshot was taken 25.10.2026**.
 - [x] Owner reports `saved` on 25.10.2026: 114 packages, 0 disabled, snapshot moved to D:\Git\FreeMyProjector outside Git checkout; no private JSON committed.
-- [ ] Independently verify checksum after move and storage protection; hardware rollback remains untested; do not call this a full firmware backup.
+- [x] Owner compared SHA256 of pulled `FengmiImaging.apk` with live OEM file on 25.10.2026: identical `948b530bbaf1cd7cf1185099422c8cf1a2521ec1bfcfd92b886c2a12456ab0f2` (one APK, not firmware).
+- [ ] Independently verify checksum of baseline JSON after move and storage protection; hardware rollback remains untested; do not call this a full firmware backup.
+- [x] Implement checksum validation and read-only live drift preview with offline fake-ADB scenarios (HOME, packages, corrupt hash, firmware); CI required. This does NOT implement restoration.
 - [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
 - [ ] Simulate Android 9 rollback of original HOME and per-package enabled/disabled states on mocks; verify failure paths and absence of dangerous fallback.

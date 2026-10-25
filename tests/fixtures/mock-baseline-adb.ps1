@@ -23,12 +23,14 @@ $props = @{
 if ($cmd -match '^shell getprop (\S+)$') {
     $key = $Matches[1]
     if (-not $props.ContainsKey($key)) { throw 'Unexpected property' }
-    if ($case -eq 'wrong-firmware' -and $key -eq 'ro.build.display.id') { 'PQ3B.190705.003.2102'; return }
+    if ($case -in @('wrong-firmware','current-wrong-firmware') -and $key -eq 'ro.build.display.id') { 'PQ3B.190705.003.2102'; return }
     $props[$key]
     return
 }
 if ($cmd -eq 'shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME') {
     if ($case -eq 'wrong-home') { 'android'; return }
+    if ($case -eq 'current-home-other') { 'com.fader.freemyprojector/.PreviewActivity'; return }
+    if ($case -eq 'current-fallback-home') { 'com.android.tv.settings/.system.FallbackHome'; return }
     'com.google.android.tvlauncher/.MainActivity'
     return
 }
@@ -48,8 +50,11 @@ $all = @(
 'com.google.android.gms','com.google.android.gsf','com.android.systemui',
 'com.android.vending','com.google.android.katniss','com.example.otherapp'
 )
+if ($case -eq 'current-extra-app') { $all += 'com.example.newapp' }
+if ($case -eq 'current-removed-app') { $all = @($all | Where-Object { $_ -ne 'com.example.otherapp' }) }
 $off = @('com.example.otherapp')
-if ($case -eq 'zero-disabled') { $off = @() }
+if ($case -eq 'current-removed-app') { $off = @() }
+if ($case -in @('zero-disabled','current-state-changed')) { $off = @() }
 if ($case -eq 'protected-disabled') { $off = @('com.fengmi.projector.imaging') }
 if ($cmd -eq 'shell pm list packages') {
     $all | ForEach-Object { "package:$_" }
