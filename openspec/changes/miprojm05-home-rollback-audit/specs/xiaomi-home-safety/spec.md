@@ -108,6 +108,10 @@ The owner-facing snapshot tool SHALL collect the original HOME, all installed/en
 - **WHEN** the device reports an existing disabled package
 - **THEN** the baseline SHALL record it as originally disabled instead of treating all packages as enabled.
 
+#### Scenario: Default output in local project workspace
+- **WHEN** the Windows read-only snapshot script runs without an explicit output directory and is checked out in `D:\Git\FreeMyProjector\FreeMyProjector-main`
+- **THEN** save the new dated private snapshot next to (not inside) the Git checkout, in `D:\Git\FreeMyProjector`, without touching a previous snapshot or contacting any mutating ADB API.
+
 #### Scenario: Backup output path within repository
 - **WHEN** an output location is inside the source tree
 - **THEN** reject it before contacting ADB, to avoid accidentally committing per-device inventories.

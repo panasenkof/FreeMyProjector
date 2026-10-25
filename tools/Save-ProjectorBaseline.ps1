@@ -7,13 +7,18 @@
   Only reads ADB devices, getprop, package HOME queries and package lists.
   Refuses unknown firmware, ambiguous HOME and inconsistent package states.
   Saves only after all checks pass, in a NEW directory outside this repository.
+  By default uses the parent folder of the Git checkout (local project workspace).
 .EXAMPLE
-  .\tools\Save-ProjectorBaseline.ps1 -AdbPath $adb -OutputDirectory "$env:USERPROFILE\Documents"
+  .\tools\Save-ProjectorBaseline.ps1 -AdbPath $adb
+  # If checkout is D:\Git\FreeMyProjector\FreeMyProjector-main,
+  # files go into D:\Git\FreeMyProjector\MiProjM05-baseline-...\
+.EXAMPLE
+  .\tools\Save-ProjectorBaseline.ps1 -AdbPath $adb -OutputDirectory 'D:\Git\FreeMyProjector'
 #>
 [CmdletBinding()]
 param(
     [string]$AdbPath = 'adb',
-    [Parameter(Mandatory = $true)][string]$OutputDirectory
+    [string]$OutputDirectory = ''
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -61,9 +66,13 @@ function Read-Packages {
 function Sorted($Items) { return @($Items | Sort-Object) }
 
 # Validate output location before connecting to any device.
+$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path.TrimEnd([char[]]@('\','/'))
+# Local evidence lives BESIDE the repository, never inside its Git checkout.
+if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
+    $OutputDirectory = Split-Path -Parent $repo
+}
 if (-not (Test-Path -LiteralPath $OutputDirectory -PathType Container)) { Fail 'Choose an existing output directory' }
 $dest = (Resolve-Path -LiteralPath $OutputDirectory).Path.TrimEnd([char[]]@('\','/'))
-$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path.TrimEnd([char[]]@('\','/'))
 $comparison = [StringComparison]::OrdinalIgnoreCase
 if ($dest.Equals($repo,$comparison) -or
     $dest.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,$comparison) -or

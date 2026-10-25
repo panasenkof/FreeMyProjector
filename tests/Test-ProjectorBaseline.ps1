@@ -75,6 +75,27 @@ try {
     Check ($errorText -match 'outside repository') 'Snapshot inside repo must be refused'
     Check (-not (Test-Path -LiteralPath $env:FMP_MOCK_LOG)) 'ADB queried with unsafe output path'
     Write-Host 'PASS: reject in-repository output before ADB'
+    # When no -OutputDirectory is provided, save next to the Git checkout.
+    # Isolate the test in a disposable directory so it never touches the developer's data.
+    $workspace = Join-Path $tmp 'workspace'
+    $checkout = Join-Path $workspace 'FreeMyProjector-main'
+    $toolDir = Join-Path $checkout 'tools'
+    [void](New-Item -ItemType Directory -Path $toolDir -Force)
+    $copiedScript = Join-Path $toolDir 'Save-ProjectorBaseline.ps1'
+    Copy-Item -LiteralPath $script -Destination $copiedScript
+    $originalFolder = Join-Path $workspace 'MiProjM05-baseline-original'
+    [void](New-Item -ItemType Directory -Path $originalFolder)
+    [IO.File]::WriteAllText((Join-Path $originalFolder 'keep.txt'),'do-not-touch')
+    $env:FMP_MOCK_CASE = 'connected'
+    $env:FMP_MOCK_LOG = Join-Path $tmp 'default-location.calls.txt'
+    $saved = & $copiedScript -AdbPath $fake | ConvertFrom-Json
+    Check ($saved.status -eq 'saved') 'Default baseline should succeed'
+    $savedFolder = Join-Path $workspace $saved.record_name
+    Check (Test-Path -LiteralPath (Join-Path $savedFolder 'baseline.private.json')) 'Default save must be beside checkout'
+    Check (Test-Path -LiteralPath (Join-Path $savedFolder 'SHA256SUMS.txt')) 'Default save must include checksum'
+    Check (-not (Test-Path -LiteralPath (Join-Path $checkout $saved.record_name))) 'Default save must not be inside Git repo'
+    Check ((Get-Content -LiteralPath (Join-Path $originalFolder 'keep.txt') -Raw) -eq 'do-not-touch') 'Previous snapshot modified'
+    Write-Host 'PASS: default output beside Git checkout, existing data left untouched'
     Write-Host 'All P-04B mock tests passed. No real projector used.'
 }
 finally {
