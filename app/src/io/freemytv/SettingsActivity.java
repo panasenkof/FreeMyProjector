@@ -113,10 +113,10 @@ public class SettingsActivity extends Activity {
     }
 
     static final class SettingsView extends View implements Choreographer.FrameCallback {
-        private static final int MAIN = 0, HOME_CHOICE = 1, HOME_SETTINGS = 2, REMOTE_KEYS = 3, PICKER = 4, SHELF_EDIT = 5;
+        private static final int MAIN = 0, HOME_CHOICE = 1, HOME_SETTINGS = 2, REMOTE_KEYS = 3, PICKER = 4, SHELF_EDIT = 5, PROJECTOR_GROUPS = 6, PROJECTOR_ITEMS = 7;
         private static final float LIST_ROW_H = 68, LIST_ROW_GAP = 6;
         private static final int PICK_VISIBLE = 9;
-        private static final float LIST_X = 1000, LIST_R = 1824, LIST_TOP = 186, ROW_H = 74, ROW_GAP = 8, CHOICE_H = 104;
+        private static final float LIST_X = 1000, LIST_R = 1824, LIST_TOP = 186, ROW_H = 68, ROW_GAP = 4, CHOICE_H = 104;
         private static final int AMBER = 0xFFFFC266, INK = 0xFF1C1C1E;
 
         private final SettingsActivity activity;
@@ -137,6 +137,7 @@ public class SettingsActivity extends Activity {
         private JSONObject state = new JSONObject(), recs = new JSONObject();
         private boolean hasKey;
         private int screen = MAIN, focus;
+        private int projectorGroup;
         private boolean running, okDown, backDown, wasBusy;
         private StaticLayout errorLayout;   // the last error, wrapped (rebuilt only when it changes)
         private String errorShown;
@@ -210,9 +211,12 @@ public class SettingsActivity extends Activity {
                         return Ui.tr("Início, ", "Home Screen, ") + value;
                     }
                     String[] names = {Ui.tr("Tela de Descanso, ver agora", "Screensaver, preview"), Ui.tr("Ajustes do Início", "Home Settings"),
-                            Ui.tr("Prateleira", "Shelf"), Ui.tr("Botões do Controle", "Remote Buttons"), Ui.tr("Controle e Bluetooth", "Remote & Bluetooth"), Ui.tr("Ajustes da TV", "TV Settings")};
+                            Ui.tr("Prateleira", "Shelf"), Ui.tr("Botões do Controle", "Remote Buttons"), Ui.tr("Controle e Bluetooth", "Remote & Bluetooth"), Ui.tr("Funções do projetor", "Projector features"), Ui.tr("Ajustes da TV", "TV Settings")};
                     return row - 1 < names.length ? names[row - 1] : "";
                 }
+                case PROJECTOR_GROUPS: return ProjectorSettingsNavigator.sectionTitle(row);
+                case PROJECTOR_ITEMS: return ProjectorSettingsNavigator.itemTitle(projectorGroup, row)
+                        + ", " + ProjectorSettingsNavigator.itemRoute(projectorGroup, row);
                 case HOME_CHOICE: {
                     String name = row == 0 ? "FreeMyProjector, " + Ui.tr("sem anúncios, com a tela de descanso nova", "no ads, with the new screensaver")
                             : "Original, " + Ui.tr("o Início de fábrica da TV", "the TV's factory home screen");
@@ -332,7 +336,9 @@ public class SettingsActivity extends Activity {
 
         private int rowCount() {
             switch (screen) {
-                case MAIN: return 7;
+                case MAIN: return 8;
+                case PROJECTOR_GROUPS: return ProjectorSettingsNavigator.SECTION_COUNT;
+                case PROJECTOR_ITEMS: return ProjectorSettingsNavigator.itemCount(projectorGroup);
                 case HOME_CHOICE: return 2;
                 case HOME_SETTINGS: return settingLabels().length;
                 case PICKER: return Math.min(PICK_VISIBLE, pickLabels.size());
@@ -374,9 +380,9 @@ public class SettingsActivity extends Activity {
             String mode = freeActive() ? "FreeMyProjector" : Ui.tr("Original", "Original");
             String[] labels = {Ui.tr("Início", "Home Screen"), Ui.tr("Tela de Descanso", "Screensaver"),
                     Ui.tr("Ajustes do Início", "Home Settings"), Ui.tr("Prateleira", "Shelf"),
-                    Ui.tr("Botões do Controle", "Remote Buttons"), Ui.tr("Controle e Bluetooth", "Remote & Bluetooth"), Ui.tr("Ajustes da TV", "TV Settings")};
-            String[] values = {working ? "" : mode, Ui.tr("Ver agora", "Preview"), "", "", "", "", ""};
-            for (int i = 0; i < 7; i++) {
+                    Ui.tr("Botões do Controle", "Remote Buttons"), Ui.tr("Controle e Bluetooth", "Remote & Bluetooth"), Ui.tr("Funções do projetor", "Projector features"), Ui.tr("Ajustes da TV", "TV Settings")};
+            String[] values = {working ? "" : mode, Ui.tr("Ver agora", "Preview"), "", "", "", "", "", ""};
+            for (int i = 0; i < 8; i++) {
                 float y = (LIST_TOP + i * (ROW_H + ROW_GAP)) * k;
                 rowRect.set(LIST_X * k, y, LIST_R * k, y + ROW_H * k);
                 float f = drawRowBackground(c, i);
@@ -403,7 +409,7 @@ public class SettingsActivity extends Activity {
                 }
             }
 
-            float y = (LIST_TOP + 6 * (ROW_H + ROW_GAP) + 20) * k;
+            float y = (LIST_TOP + 8 * (ROW_H + ROW_GAP) + 20) * k;
             String error = state.optString("error");
             if (working && (busyText.contains("Permitir") || busyText.contains("Allow") || busyText.contains("разрешите"))) {
                 c.drawText(Ui.tr("Na TV: marque “Sempre permitir” e aperte OK.", "On the TV: tick “Always allow” and press OK."),
@@ -607,8 +613,12 @@ public class SettingsActivity extends Activity {
                             } else if (screen == PICKER) {
                                 focus = pickFor - 1;
                                 screen = REMOTE_KEYS;
+                            } else if (screen == PROJECTOR_ITEMS) {
+                                focus = projectorGroup;
+                                screen = PROJECTOR_GROUPS;
                             } else {
-                                focus = screen == HOME_SETTINGS ? 2 : screen == SHELF_EDIT ? 3 : screen == REMOTE_KEYS ? 4 : 0;
+                                focus = screen == HOME_SETTINGS ? 2 : screen == SHELF_EDIT ? 3 : screen == REMOTE_KEYS ? 4
+                                        : screen == PROJECTOR_GROUPS ? 6 : 0;
                                 screen = MAIN;
                             }
                         }
@@ -921,26 +931,46 @@ public class SettingsActivity extends Activity {
 
         private void drawList(Canvas c) {
             boolean keys = screen == REMOTE_KEYS;
-            String[] labels = keys ? keyLabels() : settingLabels();
-            String[] values = keys ? keyValues() : settingValues();
+            boolean groups = screen == PROJECTOR_GROUPS;
+            boolean items = screen == PROJECTOR_ITEMS;
+            String[] labels;
+            String[] values;
+            if (groups || items) {
+                int count = rowCount();
+                labels = new String[count];
+                values = new String[count];
+                for (int i = 0; i < count; i++) {
+                    labels[i] = groups ? ProjectorSettingsNavigator.sectionTitle(i)
+                            : ProjectorSettingsNavigator.itemTitle(projectorGroup, i);
+                    values[i] = groups ? "" : ProjectorSettingsNavigator.itemRoute(projectorGroup, i);
+                }
+            } else {
+                labels = keys ? keyLabels() : settingLabels();
+                values = keys ? keyValues() : settingValues();
+            }
             Paint heading = Ui.text(Ui.displaySemibold, 34 * k, 0xFFFFFFFF);
-            c.drawText(keys ? Ui.tr("Botões do Controle", "Remote Buttons") : Ui.tr("Ajustes do Início", "Home Settings"),
+            c.drawText(groups ? Ui.tr("Funções do projetor", "Projector features")
+                            : items ? ProjectorSettingsNavigator.sectionTitle(projectorGroup)
+                            : keys ? Ui.tr("Botões do Controle", "Remote Buttons") : Ui.tr("Ajustes do Início", "Home Settings"),
                     LIST_X * k + 30 * k, (LIST_TOP - 24) * k, heading);
             for (int i = 0; i < labels.length; i++) {
                 float y = (LIST_TOP + 20 + i * (LIST_ROW_H + LIST_ROW_GAP)) * k;
                 rowRect.set(LIST_X * k, y, LIST_R * k, y + LIST_ROW_H * k);
                 float f = drawRowBackground(c, i);
                 rowLabel.setColor(blend(0xF2FFFFFF, INK, f));
-                boolean locked = !keys && i >= COIN_ROWS && !Prefs.quotes();
+                boolean locked = !keys && !groups && !items && i >= COIN_ROWS && !Prefs.quotes();
                 rowValue.setColor(blend(locked ? 0x59FFFFFF : 0xB3FFFFFF, locked ? 0x591C1C1E : 0xB31C1C1E, f));
                 if (locked) rowLabel.setColor(blend(0x73FFFFFF, 0x731C1C1E, f));
                 float base = rowRect.centerY() + Ui.halfCap(rowLabel);
-                c.drawText(labels[i], rowRect.left + 30 * k, base, rowLabel);
+                c.drawText(TextUtils.ellipsize(labels[i], new TextPaint(rowLabel),
+                        (groups ? 690 : items ? 470 : 700) * k, TextUtils.TruncateAt.END).toString(),
+                        rowRect.left + 30 * k, base, rowLabel);
                 c.drawText(values[i], rowRect.right - 30 * k, base, rowValue);
             }
             Paint hint = Ui.text(Ui.regular, 23 * k, 0x8CFFFFFF);
             float hy = (LIST_TOP + 20 + labels.length * (LIST_ROW_H + LIST_ROW_GAP) + 36) * k;
-            c.drawText(Ui.tr("OK ou as setas mudam o valor.", "OK or the arrows change the value."), LIST_X * k + 30 * k, hy, hint);
+            c.drawText(groups || items ? Ui.tr("OK abre o menu original. Voltar regressa.", "OK opens factory settings. Back returns.")
+                            : Ui.tr("OK ou as setas mudam o valor.", "OK or the arrows change the value."), LIST_X * k + 30 * k, hy, hint);
             if (keys) {
                 c.drawText(RemoteKeys.VESTEL ? Ui.tr("YouTube, Prime Video e Google Play: a própria TV controla esses botões.",
                         "YouTube, Prime Video and Google Play: the TV itself controls those buttons.")
@@ -979,6 +1009,12 @@ public class SettingsActivity extends Activity {
                 return;
             } else if (screen == REMOTE_KEYS) {
                 openPicker(focus + 1);
+            } else if (screen == PROJECTOR_GROUPS) {
+                projectorGroup = focus;
+                screen = PROJECTOR_ITEMS;
+                focus = 0;
+            } else if (screen == PROJECTOR_ITEMS) {
+                ProjectorSettingsNavigator.openFromUserTap(activity, projectorGroup, focus);
             } else if (screen == HOME_SETTINGS && focus == CITY_ROW) {
                 askCity();
                 return;
@@ -1006,6 +1042,9 @@ public class SettingsActivity extends Activity {
             } else if (focus == 5) {
                 // Manual navigation only. Never pair automatically or alter Bluetooth state.
                 ProjectorRemoteSettings.openFromUserTap(activity);
+            } else if (focus == 6) {
+                screen = PROJECTOR_GROUPS;
+                focus = 0;
             } else {
                 activity.startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
