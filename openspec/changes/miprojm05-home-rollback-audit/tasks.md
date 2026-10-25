@@ -18,8 +18,9 @@
 - [x] Owner compared SHA256 of pulled `FengmiImaging.apk` with live OEM file on 25.10.2026: identical `948b530bbaf1cd7cf1185099422c8cf1a2521ec1bfcfd92b886c2a12456ab0f2` (one APK, not firmware).
 - [x] Owner verified SHA256 of moved baseline JSON in local folder with `Compare-ProjectorBaseline.ps1 -VerifyOnly` on 25.10.2026: `status=verified`, `sha256=match`, 114/0, no ADB/no device writes.
 - [ ] Review physical/offline storage protection of snapshot; hardware rollback remains untested; do not call this a full firmware backup.
-- [ ] Run approved read-only baseline-versus-live-device comparison; record only non-sensitive differences, if any.
+- [x] Owner ran read-only baseline-versus-live-device comparison 25.10.2026: `matches-baseline`, exact Google TV HOME, identical firmware and 114/114 package states; no package differences or device writes. No private JSON stored in Git.
 - [x] Implement checksum validation and read-only live drift preview with offline fake-ADB scenarios (HOME, packages, corrupt hash, firmware); CI required. This does NOT implement restoration.
+- [ ] Owner to execute safe [P-04C manual checklist](../../../docs/P04C_REMOTE_PICTURE_MANUAL_CHECKLIST.md): remote/gear/voice/long-press, original picture/focus/keystone/HDMI and alternative control. Do NOT unpair/reset/recalibrate yet.
 - [ ] Test the **actual** pairing/re-pairing and gear key, voice, long-press Volume, cold boot, emergency alternative input; document precise MiProjM05 model behavior.
 - [ ] Record the exact OEM picture-mode settings and meaning of camera brightness; verify identical state before/after ordinary APK trial.
 - [ ] Simulate Android 9 rollback of original HOME and per-package enabled/disabled states on mocks; verify failure paths and absence of dangerous fallback.
