@@ -27,7 +27,9 @@
 - [x] Add one-command local Windows offline mock-rollback runner using owner's SHA-verified baseline without ADB/Android writes, plus temp-fixture cleanup and mocked CI coverage; owner-side execution remains pending.
 - [x] Owner executed `tools/Test-ProjectorRollbackLocally.ps1` with original 114-package SHA-verified baseline on 25.10.2026: `status=passed`, `OFFLINE_MOCK_ONLY`, 5 cases, original unchanged, 0 ADB/physical writes. Injected faults were correctly detected. This is NOT actual firmware/HOME rollback.
 - [x] Add P-04E read-only user 0 scoping check and offline fake ADB regressions, including Android chooser HOME rejection. Hardware scope check pending CI and owner run.
-- [ ] Owner to verify user 0 package-scope semantics on `.4185` using read-only `tools/Test-ProjectorUser0Scope.ps1`, no syswrites, no baseline overwrite.
+- [x] Owner executed P-04E real-device check on MiProjM05 `.4185` 25.10.2026: `user0-matches-baseline`, active Android user 0, implicit/explicit=114, 0 disabled, 0 discrepancies vs baseline, SHA match and zero device writes.
+- [x] Document P-04F Android 9 recovery gates G0-G6, marking confirmed evidence and missing emergency/OEM/firmware proofs; this is a **design protocol only**.
+- [ ] Demonstrate an independent physical recovery/control path, obtain picture/optics/pairing baseline evidence and validate actual Android 9 HOME restoration only in a separately approved and safe hardware procedure.
 - [ ] Independently implement and review actual Android 9 recovery protocol only after manual and emergency-access gates; no mutation in this change.
 - [ ] Confirm a realistic independent device-recovery method before a HOME pilot.
 
