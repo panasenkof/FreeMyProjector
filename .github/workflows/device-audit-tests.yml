@@ -1,8 +1,10 @@
-name: P-01/P-04B read-only ADB snapshot and comparison tests
+name: P-01/P-04A/P-04B read-only device safety checks
 
 on:
   pull_request:
     paths:
+      - "app/src/io/freemytv/ProjectorFactoryScreens.java"
+      - "tests/Test-ProjectorOemScreens.ps1"
       - "tools/read-only-device-info.ps1"
       - "tools/Save-ProjectorBaseline.ps1"
       - "tools/Compare-ProjectorBaseline.ps1"
@@ -37,3 +39,4 @@ jobs:
           .\tests\Test-ReadOnlyDeviceInfo.ps1
           .\tests\Test-ProjectorBaseline.ps1
           .\tests\Test-ProjectorBaselineComparison.ps1
+          .\tests\Test-ProjectorOemScreens.ps1
