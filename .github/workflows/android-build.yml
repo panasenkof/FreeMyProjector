@@ -54,6 +54,9 @@ jobs:
       - name: Verify identity, version policy and P-04 safety lock
         run: python3 tools/ci/verify_identity.py
 
+      - name: Check selective upstream shelf sync and projector guards
+        run: python3 -m unittest discover -s tools/ci -p "test_upstream_shelf_2026_11.py" -v
+
       - name: Confirm legacy signing is fail-closed without secrets
         shell: bash
         run: |
