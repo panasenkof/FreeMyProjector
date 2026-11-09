@@ -102,7 +102,8 @@ FreeMyProjector → Настройки [CODE; не физический тест
 | Документ | Что в нём |
 | --- | --- |
 | [PROJECTOR_COMPATIBILITY.md](PROJECTOR_COMPATIBILITY.md) | Фото модели/сборки и ADB-подтверждение |
-| [UPSTREAM_REVIEW_2026-10-25.md](UPSTREAM_REVIEW_2026-10-25.md) | Обновления Free My TV v1.2.0 и CleanYourTV MiProjM05 |
+| [UPSTREAM_REVIEW_2026-11-09.md](UPSTREAM_REVIEW_2026-11-09.md) | Сверка Free My TV / CleanYourTV на 09.11, перенос RU-приложений, новые данные о пульте и HOME (разные прошивки) |
+| [UPSTREAM_REVIEW_2026-10-25.md](UPSTREAM_REVIEW_2026-10-25.md) | Архивная точка сравнения: Free My TV v1.2.0 и CleanYourTV MiProjM05 |
 | [CLEANYOURTV_MIPROJM05_RESEARCH.md](CLEANYOURTV_MIPROJM05_RESEARCH.md) | Стандартный профиль для похожей, но **другой сборки** `.2102` |
 | [P04B_READONLY_COMPARISON.md](P04B_READONLY_COMPARISON.md) / [P04D_OFFLINE_ROLLBACK_SIMULATION.md](P04D_OFFLINE_ROLLBACK_SIMULATION.md) | SHA снимка, сравнение текущего состояния и PC offline тест восстановления |
 | [P04E_USER0_READONLY_AUDIT.md](P04E_USER0_READONLY_AUDIT.md) | Подтверждение 114 пакетов для Android user 0 |
