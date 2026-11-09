@@ -354,10 +354,11 @@ final class HomeApps {
         return "hdmi";
     }
 
-    /** All installed launchable apps, including favorites, plus the FreeMyProjector settings. */
+    /** Other installed launchable apps; a favorite isn't duplicated in All Apps. */
     static List<Item> others(Context c) {
         PackageManager pm = c.getPackageManager();
         Set<String> skip = new HashSet<>();
+        skip.addAll(shelfPackages(c));
         skip.addAll(java.util.Arrays.asList(LIVE_TV_APPS));
         skip.add(c.getPackageName());
         skip.addAll(HIDDEN);
@@ -382,7 +383,7 @@ final class HomeApps {
         }
         Collections.sort(items, (a, b) -> a.label.toLowerCase(Locale.ROOT).compareTo(b.label.toLowerCase(Locale.ROOT)));
         synchronized (HomeApps.class) {
-            TILES.keySet().removeIf(k -> k.contains(".") && !seen.contains(k));
+            TILES.keySet().removeIf(k -> k.contains(".") && !seen.contains(k) && !skip.contains(k));
         }
         items.add(special(c, SETTINGS, "freemytv-settings", "FreeMyProjector", "sparkles"));
         return items;
