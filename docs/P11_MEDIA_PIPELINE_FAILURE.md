@@ -85,6 +85,7 @@
 $adb = 'adb'
 $folder = 'D:\Git\FreeMyProjector\local-media-diagnostics'
 $phase = 'good' # позже заменить на 'bad'
+$snapshot = 'D:\\Git\\FreeMyProjector\\MiProjM05-baseline-YYYYMMDD' # заменить существующим путём
 New-Item -ItemType Directory -Force -Path $folder | Out-Null
 
 # P-04E: сначала проверить эталон; $snapshot — путь к прежнему локальному снимку
