@@ -42,7 +42,16 @@ class RussianShelfSyncTests(unittest.TestCase):
     def test_installed_only_and_user_order_are_preserved(self):
         self.assertIn("if (custom != null) return custom;", self.source)
         self.assertIn("launchIntent(pm, d[2]) != null", self.source)
-        self.assertIn("static final int MAX_SHELF = 8;", self.source)
+        self.assertIn("static final int MAX_SHELF = ShelfSizing.MAX_ITEMS;", self.source)
+        self.assertIn("static final int DEFAULT_SHELF_SIZE = ShelfSizing.DEFAULT_ITEMS;", self.source)
+        self.assertIn("if (items.size() >= MAX_SHELF) break;", self.source)
+        self.assertIn("if (out.size() >= MAX_SHELF) break;", self.source)
+
+    def test_any_launchable_play_app_can_be_favorited(self):
+        self.assertIn("Intent.CATEGORY_LAUNCHER", self.source)
+        self.assertIn("Intent.CATEGORY_LEANBACK_LAUNCHER", self.source)
+        self.assertIn("if (launchIntent(pm, pkg) == null) continue;", self.source)
+        self.assertIn("if (!pkg.equals(c.getPackageName())", self.source)
 
     def test_home_switch_and_recovery_remain_locked(self):
         safety = MODE_JOB.read_text(encoding="utf-8")
