@@ -68,7 +68,7 @@ final class HomeView extends ViewGroup implements Choreographer.FrameCallback, H
     // Shelf: tiles with corners concentric with the glass (glass radius = tile radius + padding).
     // Shelf like the tvOS 27 Dock: 5:3 icons (210 × 126) in each brand's color, 48 apart, and the glass bar hugging
     // them with 40 of padding (the focused icon grows 20% without touching its edge).
-    private static final float SHELF_PAD = 40, TILE_GAP = 48;
+    private static final float SHELF_PAD = 40;
     private static final float TILE_RADIUS = 22, TILE_MAX_W = 270;
     // Tile focus (Apple TV style): it grows from the center and its shadow drops (it "rises" toward the viewer).
     private static final float FOCUS_GROW = 0.2f;
@@ -1119,13 +1119,17 @@ final class HomeView extends ViewGroup implements Choreographer.FrameCallback, H
 
     private void layoutShelf() {
         int n = shelf.size();
-        float pad = SHELF_PAD * k, gap = TILE_GAP * k, th = L_TILE_H * k;
-        float full = (CONTENT_R - MARGIN) * k;
-        float tw = Math.min(TILE_MAX_W * k, (full - Math.max(0, n - 1) * gap) / Math.max(1, n));
+        float pad = SHELF_PAD * k, gap = ShelfSizing.gap(n) * k;
+        float tw = ShelfSizing.width(CONTENT_R - MARGIN, TILE_MAX_W, n) * k;
+        // Eight apps preserve their original dimensions. Beyond eight, width and height
+        // shrink together, down to at least 120x85 px at the 1920px reference scale.
+        float baseTw = ShelfSizing.width(CONTENT_R - MARGIN, TILE_MAX_W, ShelfSizing.DEFAULT_ITEMS) * k;
+        float th = ShelfSizing.height(tw, baseTw, L_TILE_H * k);
         float width = n * tw + Math.max(0, n - 1) * gap, left = (w - width) / 2f;
         float top = L_PLATTER_TOP * k;
-        platterRect.set(left - pad, top, left + width + pad, top + th + 2 * pad);
-        float x = left, y = top + pad;
+        // The glass bar keeps its existing height while icons scale within it.
+        platterRect.set(left - pad, top, left + width + pad, top + L_TILE_H * k + 2 * pad);
+        float x = left, y = top + pad + (L_TILE_H * k - th) / 2f;
         for (int i = 0; i < n; i++) {
             tileRects[i].set(x, y, x + tw, y + th);
             x += tw + gap;
