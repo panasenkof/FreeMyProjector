@@ -9,6 +9,21 @@ The project SHALL treat observed fast/silent video across applications as a pote
 - **WHEN** video accelerates without sound in YouTube and other apps remain affected until reboot
 - **THEN** this SHALL be recorded as a stock-system fault, and test conclusions SHALL distinguish AudioTrack/AV sync, AudioFlinger/AudioPolicy, decoder resource state and output routing as separate hypotheses.
 
+### Requirement: Prioritize a reversible Bluetooth A2DP isolation test
+When the sound for the failing video is routed through an external Bluetooth audio accessory, the project SHALL prioritize distinguishing an A2DP session/routing/clock failure from a broader system media failure, without disabling Bluetooth globally or affecting remote pairing.
+
+#### Scenario: Fast video with silent Bluetooth speaker
+- **WHEN** the stock projector produces fast/silent video while connected to an external Bluetooth audio device
+- **THEN** the test SHALL capture the broken state before any restart or route change, if feasible, and SHALL attempt a manual disconnect of only the audio device via the stock interface, followed by playback using the projector speakers.
+
+#### Scenario: Speaker output works without reboot
+- **WHEN** playback normalizes immediately on the projector speakers while Bluetooth audio is disconnected
+- **THEN** the finding SHALL increase suspicion of A2DP/audio routing; it SHALL NOT be recorded as a proven codec defect without repeatable evidence.
+
+#### Scenario: Speaker output still fails
+- **WHEN** playback remains broken on the projector speakers after manual Bluetooth audio disconnection
+- **THEN** the project SHALL examine persistent AudioFlinger/AudioPolicy/MediaCodec state rather than installing codec libraries.
+
 ### Requirement: Compare normal and broken states with privacy and safety
 The project SHALL provide a read-only procedure for collecting normal and broken audio state, with local-only storage and no system mutation.
 
