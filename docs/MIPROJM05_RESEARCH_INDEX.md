@@ -102,6 +102,7 @@ FreeMyProjector → Настройки [CODE; не физический тест
 | Документ | Что в нём |
 | --- | --- |
 | [PROJECTOR_COMPATIBILITY.md](PROJECTOR_COMPATIBILITY.md) | Фото модели/сборки и ADB-подтверждение |
+| [P11_MEDIA_PIPELINE_FAILURE.md](P11_MEDIA_PIPELINE_FAILURE.md) | Проблема на штатном MiProjM05: YouTube ускоряет видео без звука, повреждённое состояние сохраняется в других приложениях до reboot. Причины неизвестны, good/bad диагностика без правки прошивки. |
 | [PROJECTOR_FIELD_REPORTS_2026-11-09.md](PROJECTOR_FIELD_REPORTS_2026-11-09.md) | Реальные испытания на MiProjM05, Wanbo, XGIMI, Xiaomi Laser Cinema: HOME, пульт, HDMI, откат, дополнительные критерии P-04/P-05 |
 | [UPSTREAM_REVIEW_2026-11-09.md](UPSTREAM_REVIEW_2026-11-09.md) | Сверка Free My TV / CleanYourTV на 09.11, перенос RU-приложений, новые данные о пульте и HOME (разные прошивки) |
 | [UPSTREAM_REVIEW_2026-10-25.md](UPSTREAM_REVIEW_2026-10-25.md) | Архивная точка сравнения: Free My TV v1.2.0 и CleanYourTV MiProjM05 |
