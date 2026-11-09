@@ -24,6 +24,10 @@ __pycache__/
 *keystore*.b64
 *.signing-secret
 
+# P-11 local audio/video dumps and sensitive media logs (never commit)
+local-media-diagnostics/
+*media-events-PRIVATE.txt
+
 # P-04B local HOME/package baselines: never commit per-device inventories
 MiProjM05-baseline-*/
 *baseline.private.json
