@@ -76,7 +76,7 @@ final class HomeApps {
     }
 
     /**
-     * Apps on the home shelf, in this order, when installed (up to MAX_SHELF): key, name, package, brand color (for
+     * Default favorites on the home shelf, in this order, when installed (initially up to DEFAULT_SHELF_SIZE): key, name, package, brand color (for
      * its logo on glass) and how to lift the logo from the app's TV art: "tint" = a white logo takes the art's
      * background color (Prime Video, Globoplay); "play" = the white triangle inside the red button stays white
      * (YouTube); empty = the art's colors as they are. Last, a visual size tweak for the logo. Edit freely.
@@ -102,7 +102,9 @@ final class HomeApps {
         {"amediateka", "Амедиатека", "ru.amediateka", "E31E24", "", "1"},
         {"wink", "Wink", "ru.rt.video.app.tv", "FF5A1F", "", "1"},
     };
-    static final int MAX_SHELF = 8;
+    // Initial favorites only. This is NOT a limit on the user's shelf or on installed applications.
+    static final int DEFAULT_SHELF_SIZE = 8;
+    private static final int ARTWORK_PREFETCH = 10;
     /** Live TV apps of some brands (the antenna's channels open through the standard Android request first). */
     static final String[] LIVE_TV_APPS = {"com.tcl.tv", "com.google.android.tv", "com.mediatek.wwtv.tvcenter", "com.sony.dtv.tvx"};
     /** Kept out of "All Apps" (only hidden, still installed). Add the ones your TV shows that you never use. */
@@ -126,38 +128,42 @@ final class HomeApps {
     private static final Map<String, Bitmap> LOGOS = new HashMap<>();   // key → colored logo with no background
 
     /**
-     * Home screen apps. `extract`: also lifts the logos that are not on disk yet (slow: background only); without it,
-     * those apps keep their TV art until the next load.
+     * Favorites in the saved order. Every installed/launchable favorite is included, not just the first eight.
+     * Artwork is loaded for the initial viewport only: eager decoding of dozens of TV banners is expensive
+     * on Android 9 hardware. HomeView loads subsequent visible artwork asynchronously as focus moves.
      */
     static List<Item> shelf(Context c, boolean extract) {
         List<Item> items = new ArrayList<>();
         PackageManager pm = c.getPackageManager();
         for (String pkg : shelfPackages(c)) {
-            if (items.size() >= MAX_SHELF) break;
             Intent launch = launchIntent(pm, pkg);
-            if (launch == null) continue;
+            if (launch == null) continue; // no placeholders for removed / unlaunchable apps
             ResolveInfo ri = pm.resolveActivity(launch, 0);
             String[] d = known(pkg);
             Item it = new Item();
             it.kind = APP;
             it.pkg = pkg;
-            if (d == null) {
-                // An app picked in Settings > Shelf that isn't in SHELF: its own name and TV art.
-                it.key = pkg;
-                it.label = ri != null ? String.valueOf(ri.loadLabel(pm)) : pkg;
-                it.tile = appTile(c, null, pkg, 0);
-            } else {
-                it.key = d[0];
-                it.label = d[1];
-                it.logo = shelfLogo(c, d[0], d[2], d[4], extract);
-                if (it.logo == null) it.tile = appTile(c, d[0], d[2], 0xFF000000 | Integer.parseInt(d[3], 16));
-                if (it.logo != null) it.logoInk = ink(it.logo);
-                it.logoDark = ownLogoCached(c, d[0] + "-dark");
-                it.logoScale = Float.parseFloat(d[5]);
-            }
+            it.key = d == null ? pkg : d[0];
+            it.label = d == null ? (ri != null ? String.valueOf(ri.loadLabel(pm)) : pkg) : d[1];
+            if (d != null) it.logoScale = Float.parseFloat(d[5]);
+            if (items.size() < ARTWORK_PREFETCH) fillShelfArtwork(c, it, extract);
             items.add(it);
         }
         return items;
+    }
+
+    /** Called off the UI thread for previously unseen favorites after navigation. */
+    static void fillShelfArtwork(Context c, Item it, boolean extract) {
+        String[] d = known(it.pkg);
+        if (d == null) {
+            it.tile = appTile(c, null, it.pkg, 0);
+            return;
+        }
+        it.logo = shelfLogo(c, d[0], d[2], d[4], extract);
+        if (it.logo == null) it.tile = appTile(c, d[0], d[2], 0xFF000000 | Integer.parseInt(d[3], 16));
+        if (it.logo != null) it.logoInk = ink(it.logo);
+        it.logoDark = ownLogoCached(c, d[0] + "-dark");
+        it.logoScale = Float.parseFloat(d[5]);
     }
 
     private static String[] known(String pkg) {
@@ -165,27 +171,45 @@ final class HomeApps {
         return null;
     }
 
-    /** The shelf's packages in order: the user's list (Settings > Shelf), or the built-in one. */
+    /** Favorites in saved order, or the eight initially suggested installed apps. */
     static List<String> shelfPackages(Context c) {
         List<String> custom = Prefs.shelf();
-        if (custom != null) return custom;
-        List<String> out = new ArrayList<>();
         PackageManager pm = c.getPackageManager();
-        for (String[] d : SHELF) if (out.size() < MAX_SHELF && launchIntent(pm, d[2]) != null) out.add(d[2]);
+        List<String> out = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        if (custom != null) {
+            for (String pkg : custom) {
+                if (!pkg.equals(c.getPackageName()) && seen.add(pkg) && launchIntent(pm, pkg) != null) out.add(pkg);
+            }
+            return out;
+        }
+        for (String[] d : SHELF) {
+            if (out.size() >= DEFAULT_SHELF_SIZE) break;
+            if (launchIntent(pm, d[2]) != null) out.add(d[2]);
+        }
         return out;
     }
 
-    /** Every app the shelf could hold, as {package, name}: the ones from SHELF first, then the other TV apps by name. */
+    /** Every installed launchable app that can be selected in Settings > Shelf, not a static whitelist. */
     static List<String[]> shelfCandidates(Context c) {
         PackageManager pm = c.getPackageManager();
         List<String[]> out = new ArrayList<>();
         Set<String> seen = new HashSet<>();
-        for (String[] d : SHELF) if (launchIntent(pm, d[2]) != null && seen.add(d[2])) out.add(new String[] {d[2], d[1]});
+        for (String[] d : SHELF) {
+            if (launchIntent(pm, d[2]) != null && seen.add(d[2])) out.add(new String[] {d[2], d[1]});
+        }
         List<String[]> more = new ArrayList<>();
+        List<ResolveInfo> activities = new ArrayList<>();
         Intent query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
-        for (ResolveInfo ri : pm.queryIntentActivities(query, 0)) {
+        activities.addAll(pm.queryIntentActivities(query, 0));
+        // Some apps installed from Play have a regular launcher entry but no TV Leanback entry.
+        query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        activities.addAll(pm.queryIntentActivities(query, 0));
+        for (ResolveInfo ri : activities) {
+            if (ri.activityInfo == null) continue;
             String pkg = ri.activityInfo.packageName;
             if (pkg.equals(c.getPackageName()) || HIDDEN.contains(pkg) || !seen.add(pkg)) continue;
+            if (launchIntent(pm, pkg) == null) continue;
             more.add(new String[] {pkg, String.valueOf(ri.loadLabel(pm))});
         }
         Collections.sort(more, (a, b) -> a[1].toLowerCase(Locale.ROOT).compareTo(b[1].toLowerCase(Locale.ROOT)));
@@ -333,22 +357,24 @@ final class HomeApps {
         return "hdmi";
     }
 
-    /** Installed, enabled TV apps that are not on the home screen (the TV's Settings is among them), plus our own. */
+    /** All installed launchable apps, including favorites, plus the FreeMyProjector settings. */
     static List<Item> others(Context c) {
         PackageManager pm = c.getPackageManager();
         Set<String> skip = new HashSet<>();
-        // A built-in app is skipped only while it is on the shelf: one the person took off must still be listed here.
-        List<String> onShelf = shelfPackages(c);
-        for (String[] d : SHELF) if (onShelf.contains(d[2])) skip.add(d[2]);
         skip.addAll(java.util.Arrays.asList(LIVE_TV_APPS));
         skip.add(c.getPackageName());
         skip.addAll(HIDDEN);
+        List<ResolveInfo> activities = new ArrayList<>();
         Intent query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
+        activities.addAll(pm.queryIntentActivities(query, 0));
+        query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        activities.addAll(pm.queryIntentActivities(query, 0));
         List<Item> items = new ArrayList<>();
         Set<String> seen = new HashSet<>();
-        for (ResolveInfo ri : pm.queryIntentActivities(query, 0)) {
+        for (ResolveInfo ri : activities) {
+            if (ri.activityInfo == null) continue;
             String pkg = ri.activityInfo.packageName;
-            if (skip.contains(pkg) || !seen.add(pkg)) continue;
+            if (skip.contains(pkg) || !seen.add(pkg) || launchIntent(pm, pkg) == null) continue;
             Item it = new Item();
             it.kind = APP;
             it.pkg = pkg;
