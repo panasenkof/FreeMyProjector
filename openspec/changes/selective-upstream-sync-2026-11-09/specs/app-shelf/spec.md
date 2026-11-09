@@ -16,6 +16,8 @@ Kinopoisk, Okko, Premier, Amediateka and Wink without installing any apps.
 - **THEN** it SHALL NOT be inserted into the default shelf.
 
 ### Requirement: Preserve existing shelf semantics
+The application SHALL preserve the custom shelf and the existing default shelf capacity while recognizing additional installed apps.
+
 #### Scenario: A person has selected their own apps
 - **WHEN** a custom shelf preference exists
 - **THEN** it SHALL remain authoritative; reference metadata MUST NOT reorder it.
@@ -25,6 +27,8 @@ Kinopoisk, Okko, Premier, Amediateka and Wink without installing any apps.
 - **THEN** the new references SHALL NOT increase the default 8-app limit.
 
 ### Requirement: No projector system writes
+Synchronizing reference metadata SHALL NOT change the projector system state or unlock HOME/recovery operations.
+
 #### Scenario: Reference metadata or CI changes are applied
 - **WHEN** the APK is built or the shelf is enumerated
 - **THEN** no OEM package SHALL be disabled, no HOME SHALL be changed,
