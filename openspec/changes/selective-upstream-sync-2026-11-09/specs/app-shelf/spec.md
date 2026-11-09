@@ -1,5 +1,7 @@
 # App shelf — selective RU metadata sync
 
+## ADDED Requirements
+
 ### Requirement: Recognize installed Russian streaming apps
 The existing projector app shelf SHALL know the package IDs for
 Kinopoisk, Okko, Premier, Amediateka and Wink without installing any apps.
