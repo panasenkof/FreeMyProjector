@@ -34,6 +34,12 @@ Keep upstream `CLAUDE.md` for historical guidance, **but do not follow its model
 - YouTube network performance is independent of home launcher replacement; diagnose before recommending changes. Never claim a VPN/proxy improves performance without local evidence.
 - Preserve original MIT license and author notice for reused code.
 
+## Safe reference-upstream intake (P-10)
+- Before copying from Free My TV or CleanYourTV, record both projects' **reviewed HEAD SHA** and the last reviewed SHA in `UPSTREAM.md` plus a dated `docs/UPSTREAM_REVIEW_*.md`. Keep the historical imported code SHA unchanged.
+- Classify each candidate as **adopt / already implemented / defer / reject**. Check whether the same feature already exists; never create a second route, registry or settings mechanism.
+- Treat hardware reports from another MiProjM05 firmware as **external evidence**, not validation on `PQ3B.190705.003.4185`. A remote-key helper that breaks long-press volume and any debloat/HOME recipe are not safe defaults.
+- For an adopted change, name the exact files and observable outcome, use a small PR with CI and separate the off-device checks from a later hardware test. Preserve both `ModeJob` gates as `false` and the independent stock HOME rollback requirement.
+
 ## Review checklist
 Check: spec ↔ code ↔ tests traceability; no risky ADB side effects; accidental secret leakage; Android 9 compatibility; handling HOME/BACK/remote; regression/rollback; actual vs assumed test results; updated canonical roadmap.
 
