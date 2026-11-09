@@ -57,6 +57,15 @@ jobs:
       - name: Check selective upstream shelf sync and projector guards
         run: python3 -m unittest discover -s tools/ci -p "test_upstream_shelf_2026_11.py" -v
 
+      - name: Test shelf size/readability for 1-12 favorites without an emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fmp-shelf-size
+          javac -encoding UTF-8 -d /tmp/fmp-shelf-size \
+            app/src/io/freemytv/ShelfSizing.java tools/ci/TestShelfSizing.java
+          java -cp /tmp/fmp-shelf-size io.freemytv.TestShelfSizing
+
       - name: Confirm legacy signing is fail-closed without secrets
         shell: bash
         run: |
