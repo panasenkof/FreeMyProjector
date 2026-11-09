@@ -93,6 +93,14 @@ final class HomeApps {
         {"peacock", "Peacock", "com.peacocktv.peacockandroid", "6E55DC", "", "1"},
         {"globoplay", "Globoplay", "com.globo.globotv", "FF5A1F", "tint", "1"},
         {"spotify", "Spotify", "com.spotify.tv.android", "1DB954", "", "1"},
+        // Selected from Free My TV's Russian app catalog (2026-11-07).
+        // App entries appear only when the package has an actual launch intent;
+        // no packages are installed, disabled or auto-launched by this list.
+        {"kinopoisk", "Кинопоиск", "ru.kinopoisk.tv", "FF5500", "", "1"},
+        {"okko", "Okko", "ru.more.play", "6D43FF", "", "1"},
+        {"premier", "Premier", "gpm.tnt_premier", "FF2D55", "", "1"},
+        {"amediateka", "Амедиатека", "ru.amediateka", "E31E24", "", "1"},
+        {"wink", "Wink", "ru.rt.video.app.tv", "FF5A1F", "", "1"},
     };
     static final int MAX_SHELF = 8;
     /** Live TV apps of some brands (the antenna's channels open through the standard Android request first). */
