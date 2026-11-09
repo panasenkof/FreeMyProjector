@@ -40,7 +40,9 @@ class RussianShelfSyncTests(unittest.TestCase):
         self.assertEqual(len(packages), len(set(packages)))
 
     def test_installed_only_and_user_order_are_preserved(self):
-        self.assertIn("if (custom != null) return custom;", self.source)
+        self.assertIn("if (custom != null) {", self.source)
+        self.assertIn("for (String pkg : custom)", self.source)
+        self.assertIn("out.add(pkg);", self.source)
         self.assertIn("launchIntent(pm, d[2]) != null", self.source)
         self.assertIn("static final int MAX_SHELF = ShelfSizing.MAX_ITEMS;", self.source)
         self.assertIn("static final int DEFAULT_SHELF_SIZE = ShelfSizing.DEFAULT_ITEMS;", self.source)
