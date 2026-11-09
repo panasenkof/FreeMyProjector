@@ -102,9 +102,9 @@ final class HomeApps {
         {"amediateka", "Амедиатека", "ru.amediateka", "E31E24", "", "1"},
         {"wink", "Wink", "ru.rt.video.app.tv", "FF5A1F", "", "1"},
     };
-    // Initial favorites only. This is NOT a limit on the user's shelf or on installed applications.
-    static final int DEFAULT_SHELF_SIZE = 8;
-    private static final int ARTWORK_PREFETCH = 10;
+    // Only favorites are capped for readability; installed apps and the All Apps grid are not.
+    static final int DEFAULT_SHELF_SIZE = ShelfSizing.DEFAULT_ITEMS;
+    static final int MAX_SHELF = ShelfSizing.MAX_ITEMS;
     /** Live TV apps of some brands (the antenna's channels open through the standard Android request first). */
     static final String[] LIVE_TV_APPS = {"com.tcl.tv", "com.google.android.tv", "com.mediatek.wwtv.tvcenter", "com.sony.dtv.tvx"};
     /** Kept out of "All Apps" (only hidden, still installed). Add the ones your TV shows that you never use. */
@@ -127,15 +127,12 @@ final class HomeApps {
     private static final Map<String, Bitmap> TILES = new HashMap<>();   // key → ready card
     private static final Map<String, Bitmap> LOGOS = new HashMap<>();   // key → colored logo with no background
 
-    /**
-     * Favorites in the saved order. Every installed/launchable favorite is included, not just the first eight.
-     * Artwork is loaded for the initial viewport only: eager decoding of dozens of TV banners is expensive
-     * on Android 9 hardware. HomeView loads subsequent visible artwork asynchronously as focus moves.
-     */
+    /** Saved favorite order, up to MAX_SHELF, with artwork loaded on the existing background worker. */
     static List<Item> shelf(Context c, boolean extract) {
         List<Item> items = new ArrayList<>();
         PackageManager pm = c.getPackageManager();
         for (String pkg : shelfPackages(c)) {
+            if (items.size() >= MAX_SHELF) break;
             Intent launch = launchIntent(pm, pkg);
             if (launch == null) continue; // no placeholders for removed / unlaunchable apps
             ResolveInfo ri = pm.resolveActivity(launch, 0);
@@ -145,14 +142,13 @@ final class HomeApps {
             it.pkg = pkg;
             it.key = d == null ? pkg : d[0];
             it.label = d == null ? (ri != null ? String.valueOf(ri.loadLabel(pm)) : pkg) : d[1];
-            if (d != null) it.logoScale = Float.parseFloat(d[5]);
-            if (items.size() < ARTWORK_PREFETCH) fillShelfArtwork(c, it, extract);
+            fillShelfArtwork(c, it, extract);
             items.add(it);
         }
         return items;
     }
 
-    /** Called off the UI thread for previously unseen favorites after navigation. */
+    /** Reuses the existing artwork pipeline; never touches launcher settings or package installation. */
     static void fillShelfArtwork(Context c, Item it, boolean extract) {
         String[] d = known(it.pkg);
         if (d == null) {
@@ -179,6 +175,7 @@ final class HomeApps {
         Set<String> seen = new HashSet<>();
         if (custom != null) {
             for (String pkg : custom) {
+                if (out.size() >= MAX_SHELF) break;
                 if (!pkg.equals(c.getPackageName()) && seen.add(pkg) && launchIntent(pm, pkg) != null) out.add(pkg);
             }
             return out;
